@@ -141,7 +141,8 @@ const SPRITE_CONFIGS = {
             idle: { frames: [0], speed: 100 },
             moveUp: { frames: [1], speed: 100 },
             moveDown: { frames: [2], speed: 100 },
-            bank: { frames: [3, 4], speed: 50 }
+            bankLeft: { frames: [3], speed: 100 },
+            bankRight: { frames: [4], speed: 100 }
         }
     },
     gargoyleDiver: {

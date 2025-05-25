@@ -36,7 +36,14 @@ class AssetLoader {
                 bulletCollection: 'assets/sprites/bullet_collection.png',
                 explosionSet: 'assets/sprites/explosion_set2.png',
                 pixelExplosion: 'assets/sprites/pixel_explosion.png',
-                simpleExplosion: 'assets/sprites/simple_explosion.png'
+                simpleExplosion: 'assets/sprites/simple_explosion.png',
+                
+                // Power-ups
+                powerupWeapon: 'assets/sprites/powerup_weapon.png',
+                powerupShield: 'assets/sprites/powerup_shield.png',
+                powerupSpeed: 'assets/sprites/powerup_speed.png',
+                powerupLife: 'assets/sprites/powerup_life.png',
+                powerupBomb: 'assets/sprites/powerup_bomb.png'
             },
             
             audio: {
@@ -45,7 +52,7 @@ class AssetLoader {
                 shootAlt: 'assets/audio/shoot_01.ogg',
                 explosion: 'assets/audio/explosion_01.ogg',
                 explosionAlt: 'assets/audio/retro_explosion.ogg',
-                powerup: 'assets/audio/retro_beep_04.ogg',
+                powerup: 'assets/audio/powerup.ogg',
                 hit: 'assets/audio/retro_laser_01.ogg',
                 gameOver: 'assets/audio/dead_end.ogg',
                 levelStart: 'assets/audio/misc_01.ogg',
@@ -53,8 +60,10 @@ class AssetLoader {
                 menuSelect: 'assets/audio/beep_01.ogg',
                 menuMove: 'assets/audio/terminal_01.ogg',
                 weaponSwitch: 'assets/audio/weapon_switch.ogg',
+                boss_explosion: 'assets/audio/boss_explosion.ogg',
                 
-                // Thunder Force 4 Music Tracks
+                // Thunder Force 4 Music Tracks - Using actual downloaded files
+                opening: 'assets/audio/lightning_strikes_again.ogg', // Opening Theme
                 menuMusic: 'assets/audio/tan_tan_ta_ta_ta_tan.ogg', // Configuration
                 stageSelect: 'assets/audio/dont_go_off.ogg', // Course Select
                 stage1Music: 'assets/audio/fighting_back.ogg', // Stage 1A
@@ -62,14 +71,15 @@ class AssetLoader {
                 stage2Music: 'assets/audio/space_walk.ogg', // Stage 2A
                 stage2BossMusic: 'assets/audio/attack_sharply.ogg', // Stage 2 Boss
                 stage3Music: 'assets/audio/the_sky_line.ogg', // Stage 3A
-                stage3BossMusic: 'assets/audio/simmer_down.ogg', // Stage 3 Boss
+                stage3BossMusic: 'assets/audio/simmer_down.ogg', // Stage 3 Boss (not downloaded yet)
                 stage4Music: 'assets/audio/sand_hell.ogg', // Stage 4A
-                stage4BossMusic: 'assets/audio/strike_out.ogg', // Stage 4 Boss
+                stage4BossMusic: 'assets/audio/strike_out.ogg', // Stage 4 Boss (not downloaded yet)
                 stage5Music: 'assets/audio/battle_ship.ogg', // Stage 5
-                stage5BossMusic: 'assets/audio/stranger.ogg', // Stage 5 Boss
+                stage5BossMusic: 'assets/audio/stranger.ogg', // Stage 5 Boss (not downloaded yet)
                 stage8Music: 'assets/audio/metal_squad.ogg', // Stage 8
                 bossMusic: 'assets/audio/war_like_requiem.ogg', // Final Boss
-                endingMusic: 'assets/audio/stand_up_against_myself.ogg' // Staff Roll
+                endingMusic: 'assets/audio/stand_up_against_myself.ogg', // Staff Roll
+                gameMusic: 'assets/audio/fighting_back.ogg' // Default game music
             },
             
             backgrounds: {

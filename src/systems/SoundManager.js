@@ -31,8 +31,12 @@ class SoundManager {
     initializeSounds() {
         // Define sound configurations
         const soundConfigs = {
+            // Sound effects
             shoot: { type: 'sfx', pooled: true },
+            shootAlt: { type: 'sfx', pooled: true },
             explosion: { type: 'sfx', pooled: true },
+            explosionAlt: { type: 'sfx', pooled: true },
+            boss_explosion: { type: 'sfx', pooled: false },
             powerup: { type: 'sfx', pooled: false },
             hit: { type: 'sfx', pooled: true },
             gameOver: { type: 'sfx', pooled: false },
@@ -40,9 +44,23 @@ class SoundManager {
             bossWarning: { type: 'sfx', pooled: false },
             menuSelect: { type: 'sfx', pooled: false },
             menuMove: { type: 'sfx', pooled: false },
+            weaponSwitch: { type: 'sfx', pooled: false },
+            
+            // Thunder Force IV Music
+            opening: { type: 'music', pooled: false },
             menuMusic: { type: 'music', pooled: false },
-            gameMusic: { type: 'music', pooled: false },
-            bossMusic: { type: 'music', pooled: false }
+            stageSelect: { type: 'music', pooled: false },
+            stage1Music: { type: 'music', pooled: false },
+            stage1BossMusic: { type: 'music', pooled: false },
+            stage2Music: { type: 'music', pooled: false },
+            stage2BossMusic: { type: 'music', pooled: false },
+            stage3Music: { type: 'music', pooled: false },
+            stage4Music: { type: 'music', pooled: false },
+            stage5Music: { type: 'music', pooled: false },
+            stage8Music: { type: 'music', pooled: false },
+            bossMusic: { type: 'music', pooled: false },
+            endingMusic: { type: 'music', pooled: false },
+            gameMusic: { type: 'music', pooled: false }
         };
 
         // Create sound objects from loaded assets
@@ -109,7 +127,7 @@ class SoundManager {
                 // Loop music
                 audio.currentTime = 0;
                 audio.play();
-            } else {
+            } else if (this.sounds[name]) {
                 this.sounds[name].playing = false;
             }
         });
@@ -154,7 +172,7 @@ class SoundManager {
         // Play new music
         if (this.sounds[musicName]) {
             this.currentMusic = this.sounds[musicName];
-            this.currentMusic.loop = loop;
+            this.currentMusic.audio.loop = loop;
             this.currentMusic.play();
         }
     }
