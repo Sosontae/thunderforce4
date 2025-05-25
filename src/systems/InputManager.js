@@ -3,6 +3,7 @@
 class InputManager {
     constructor() {
         this.keys = {};
+        this.previousKeys = {};
         this.touches = [];
         this.mousePosition = { x: 0, y: 0 };
         this.isMouseDown = false;
@@ -158,6 +159,14 @@ class InputManager {
     isKeyPressed(code) {
         return !!this.keys[code];
     }
+    
+    wasKeyPressed(code) {
+        return !!this.previousKeys[code];
+    }
+    
+    isKeyJustPressed(code) {
+        return this.isKeyPressed(code) && !this.wasKeyPressed(code);
+    }
 
     isAnyKeyPressed(...codes) {
         return codes.some(code => this.isKeyPressed(code));
@@ -165,6 +174,10 @@ class InputManager {
 
     isAllKeysPressed(...codes) {
         return codes.every(code => this.isKeyPressed(code));
+    }
+    
+    updatePreviousKeys() {
+        this.previousKeys = { ...this.keys };
     }
 
     getMovementVector() {

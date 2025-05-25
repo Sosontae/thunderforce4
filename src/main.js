@@ -1,40 +1,58 @@
 // Main entry point for Thunder Force IV Replica
 
 // Wait for DOM to load
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log('Thunder Force IV Replica - Starting...');
     
-    // Create game instance
-    const game = new Game();
+    // Show loading message
+    showLoadingMessage('LOADING ASSETS...');
     
-    // Initialize game
-    if (game.init()) {
-        console.log('Game initialized successfully!');
+    // Load all assets first
+    try {
+        const assetsLoaded = await window.assetLoader.loadAll();
         
-        // Add keyboard shortcuts
-        setupKeyboardShortcuts(game);
+        if (!assetsLoaded) {
+            throw new Error('Failed to load assets');
+        }
         
-        // Handle window focus/blur
-        setupWindowHandlers(game);
+        console.log('All assets loaded!');
         
-        // Start the game
-        game.start();
+        // Create game instance
+        const game = new Game();
         
-        // Show loading message briefly
-        showLoadingMessage();
-    } else {
-        console.error('Failed to initialize game!');
-        showErrorMessage('Failed to initialize game. Please refresh the page.');
+        // Initialize game
+        if (game.init()) {
+            console.log('Game initialized successfully!');
+            
+            // Add keyboard shortcuts
+            setupKeyboardShortcuts(game);
+            
+            // Handle window focus/blur
+            setupWindowHandlers(game);
+            
+            // Start the game
+            game.start();
+            
+            // Hide loading message
+            hideLoadingMessage();
+        } else {
+            console.error('Failed to initialize game!');
+            showErrorMessage('Failed to initialize game. Please refresh the page.');
+        }
+    } catch (error) {
+        console.error('Error during initialization:', error);
+        showErrorMessage('Failed to load game assets. Please refresh the page.');
     }
 });
 
 // Setup keyboard shortcuts
 function setupKeyboardShortcuts(game) {
     document.addEventListener('keydown', (e) => {
-        // Toggle debug mode with F1
+        // Toggle controls help with F1
         if (e.key === 'F1') {
             e.preventDefault();
-            game.toggleDebug();
+            const controlsOverlay = document.getElementById('controls-overlay');
+            controlsOverlay.classList.toggle('active');
         }
         
         // Toggle fullscreen with F11
@@ -97,7 +115,7 @@ function setupWindowHandlers(game) {
 }
 
 // Show loading message
-function showLoadingMessage() {
+function showLoadingMessage(message = 'LOADING...') {
     const loadingDiv = document.createElement('div');
     loadingDiv.id = 'loading-message';
     loadingDiv.style.cssText = `
@@ -111,20 +129,24 @@ function showLoadingMessage() {
         text-shadow: 0 0 10px #00ffff;
         pointer-events: none;
         z-index: 1000;
+        text-align: center;
     `;
-    loadingDiv.textContent = 'LOADING...';
+    loadingDiv.textContent = message;
     
     const container = document.getElementById('game-container');
     container.appendChild(loadingDiv);
-    
-    // Remove loading message after a short delay
-    setTimeout(() => {
+}
+
+// Hide loading message
+function hideLoadingMessage() {
+    const loadingDiv = document.getElementById('loading-message');
+    if (loadingDiv) {
         loadingDiv.style.transition = 'opacity 0.5s';
         loadingDiv.style.opacity = '0';
         setTimeout(() => {
             loadingDiv.remove();
         }, 500);
-    }, 1000);
+    }
 }
 
 // Show error message

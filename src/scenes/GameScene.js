@@ -127,10 +127,22 @@ class GameScene extends Scene {
             3000
         );
         
-        // Play level start sound
+        // Play level start sound and music
         if (window.soundManager) {
-            window.soundManager.play('level_start');
-            window.soundManager.playMusic('game_music');
+            window.soundManager.play('levelStart');
+            
+            // Play stage-specific music
+            const stageMusic = {
+                1: 'stage1Music',
+                2: 'stage2Music',
+                3: 'stage3Music',
+                4: 'stage4Music',
+                5: 'stage5Music',
+                8: 'stage8Music'
+            };
+            
+            const musicTrack = stageMusic[levelNumber] || 'stage1Music';
+            window.soundManager.playMusic(musicTrack);
         }
     }
 
@@ -278,18 +290,22 @@ class GameScene extends Scene {
     }
 
     spawnEnemies(deltaTime) {
-        const levelConfig = LEVELS[this.currentLevel];
+        const stageConfig = STAGES[this.currentLevel];
+        if (!stageConfig) return;
         
-        this.enemySpawnTimer += deltaTime;
-        
-        if (this.enemySpawnTimer >= levelConfig.enemySpawnRate) {
-            this.enemySpawnTimer = 0;
-            
-            // Spawn enemy wave
-            this.spawnEnemyWave();
-        }
+        // Spawn waves based on stage time
+        stageConfig.waves.forEach(wave => {
+            if (this.levelTime >= wave.time && !wave.spawned) {
+                wave.spawned = true;
+                
+                wave.enemies.forEach(enemyGroup => {
+                    spawnEnemyWave(this, enemyGroup, GAME_WIDTH + 50, GAME_HEIGHT / 2);
+                });
+            }
+        });
         
         // Check for boss spawn
+        const levelConfig = LEVELS[this.currentLevel];
         if (!this.bossSpawned && this.levelTime >= levelConfig.duration * 0.8) {
             this.spawnBoss();
         }
@@ -332,7 +348,7 @@ class GameScene extends Scene {
         
         // Play boss warning sound
         if (window.soundManager) {
-            window.soundManager.play('boss_warning');
+            window.soundManager.play('bossWarning');
         }
         
         // Spawn boss after delay
@@ -346,9 +362,19 @@ class GameScene extends Scene {
             this.enemies.push(boss);
             this.addGameObject(boss);
             
-            // Change music
+            // Change to boss music
             if (window.soundManager) {
-                window.soundManager.playMusic('boss_music');
+                const bossMusic = {
+                    1: 'stage1BossMusic',
+                    2: 'stage2BossMusic',
+                    3: 'stage3BossMusic',
+                    4: 'stage4BossMusic',
+                    5: 'stage5BossMusic',
+                    10: 'bossMusic' // Final boss
+                };
+                
+                const bossMusicTrack = bossMusic[this.currentLevel] || 'bossMusic';
+                window.soundManager.playMusic(bossMusicTrack);
             }
         }, 2000);
     }
@@ -479,6 +505,19 @@ class GameScene extends Scene {
         // Update power
         const powerPercent = (this.player.weaponLevel / WEAPONS.MAX_LEVEL) * 100;
         document.getElementById('powerValue').textContent = Math.floor(powerPercent);
+        
+        // Update weapon name
+        const weaponName = this.player.weaponSystem.selectedWeapon.name;
+        const weaponDisplay = document.getElementById('weaponName');
+        if (weaponDisplay) {
+            weaponDisplay.textContent = weaponName;
+        }
+        
+        // Update speed mode
+        const speedDisplay = document.getElementById('speedMode');
+        if (speedDisplay) {
+            speedDisplay.textContent = this.player.speedMode.toUpperCase();
+        }
     }
 
     renderBackground() {
@@ -554,7 +593,7 @@ class GameScene extends Scene {
         // Play game over sound
         if (window.soundManager) {
             window.soundManager.stopMusic();
-            window.soundManager.play('game_over');
+            window.soundManager.play('gameOver');
         }
         
         // Set up restart handler

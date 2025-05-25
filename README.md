@@ -1,79 +1,100 @@
 # Thunder Force IV Replica
 
-A web-based replica of the classic Thunder Force IV (Lightening Force) shoot 'em up game, built with HTML5 Canvas and JavaScript.
+A faithful web-based replica of the classic 1992 Sega Genesis/Mega Drive shoot 'em up Thunder Force IV (Lightening Force in North America).
 
-## Features
+## 🎮 Play Online
 
-- **Classic Gameplay**: Side-scrolling shoot 'em up action inspired by Thunder Force IV
-- **Multiple Enemy Types**: Basic, Medium, Heavy, and Boss enemies with different behaviors
-- **Power-Up System**: 
-  - Weapon upgrades (up to 5 levels)
-  - Shield protection
-  - Speed boost
-  - Extra lives
-  - Screen-clearing bombs
-- **4 Levels**: Each with unique backgrounds and enemy patterns
-- **Particle Effects**: Explosions, sparks, smoke, and engine trails
-- **Combo System**: Build combos for score multipliers
-- **Touch Controls**: Full support for mobile devices
-- **Sound System**: Simulated sound effects and music (audio files not included)
+Simply open `index.html` in a modern web browser to play!
 
-## How to Play
+## 🎯 Features
+
+### Authentic Thunder Force 4 Gameplay
+- **10 Selectable Weapons**: All original weapons including Twin Shot, Back Shot, Rail Gun, Snake, Free Way, Hunter, Blade, Wave, Shield, and CRAW
+- **Speed Control System**: 3-speed settings (Slow/Normal/Fast) just like the original
+- **Stage-Based Progression**: Multiple stages with unique enemy patterns and boss fights
+- **Power-Up System**: Collect power-ups to upgrade weapons and gain abilities
+- **Scoring System**: Combo multipliers and bonus scoring
 
 ### Controls
-
-**Keyboard:**
-- **Arrow Keys** or **WASD**: Move your ship
-- **Space** or **Z**: Shoot
-- **Esc** or **P**: Pause/Resume
+- **Arrow Keys / WASD**: Move ship
+- **Space / Z**: Fire weapon
+- **X**: Change weapon (cycles through all 10 weapons)
+- **C**: Speed control (Slow → Normal → Fast)
+- **ESC / P**: Pause game
 - **M**: Mute/Unmute sound
-- **F1**: Toggle debug mode
+- **F1**: Show/Hide controls help
 - **F11**: Toggle fullscreen
 
-**Touch/Mobile:**
-- Touch and drag on the left side of the screen to move
-- Touch the right side of the screen to shoot continuously
+### Technical Features
+- **Sprite-Based Graphics**: Uses authentic sprite sheets when available
+- **Particle Effects**: Dynamic explosions and visual effects
+- **Collision Detection**: Grid-based spatial partitioning for performance
+- **Touch Controls**: Virtual joystick support for mobile devices
+- **60 FPS Target**: Smooth gameplay with frame limiting
+- **Save System**: Progress saving (F5 to save, F9 to load)
 
-### Game Mechanics
+## 🎵 Music & Sound
 
-1. **Lives**: You start with 3 lives. Lose all lives and it's game over!
-2. **Power Levels**: Collect weapon power-ups to increase your firepower
-3. **Shield**: Protects you from one hit
-4. **Score**: Destroy enemies to earn points. Build combos for multipliers!
-5. **Boss Battles**: Each level ends with a challenging boss fight
+The game is designed to use the original Thunder Force 4 soundtrack. Due to copyright, you'll need to provide your own music files.
 
-## Running the Game
+### Required Music Tracks:
+- Configuration theme (Menu)
+- Stage music (Fighting Back, Space Walk, Metal Squad, etc.)
+- Boss themes
+- Game Over and Staff Roll
 
-1. **Direct Opening**: Simply open the `index.html` file in a modern web browser
-2. **Local Server** (recommended for best performance):
-   ```bash
-   # Using Python 3
-   python -m http.server 8000
-   
-   # Using Node.js
-   npx http-server
-   
-   # Using PHP
-   php -S localhost:8000
-   ```
-   Then navigate to `http://localhost:8000`
+See `ASSETS_SETUP.md` for detailed instructions on obtaining and setting up the music files.
 
-## Browser Requirements
+## 🎨 Assets Required
 
-- Modern browser with HTML5 Canvas support
-- JavaScript enabled
-- Recommended: Chrome, Firefox, Safari, or Edge (latest versions)
+### Sprites
+- Player ship (Rynex)
+- Enemy sprites (Gargoyle Diver, Faust, Armament Claw, etc.)
+- Boss sprites
+- Explosion animations
+- Background images
 
-## Debug Features
+### How to Set Up Assets:
+1. Read `ASSETS_SETUP.md` for detailed instructions
+2. Download sprites from Spriters Resource or similar sites
+3. Download Thunder Force 4 OST and convert to OGG format
+4. Place files in the correct `assets/` subdirectories
 
-When debug mode is enabled (F1), you can see:
-- FPS counter
-- Current scene name
-- Particle count
+## 🚀 Getting Started
 
-### Console Commands
+1. Clone or download this repository
+2. Set up the required assets (see `ASSETS_SETUP.md`)
+3. Open `index.html` in Chrome, Firefox, or Edge
+4. Press F1 in-game to see controls
+5. Enjoy the classic Thunder Force 4 experience!
 
-The game provides debug functions accessible via the browser console:
+## 🛠️ Development
+
+### Project Structure
+```
+thunderforce4/
+├── assets/          # Game assets (sprites, audio, backgrounds)
+├── src/            
+│   ├── entities/    # Game objects (Player, Enemy, Bullet, etc.)
+│   ├── scenes/      # Game scenes (Menu, Game, etc.)
+│   ├── systems/     # Core systems (Input, Sound, Collision, etc.)
+│   └── utils/       # Helper functions and constants
+├── index.html       # Main game file
+├── style.css        # Game styling
+└── README.md        # This file
+```
+
+### Key Systems
+- **AssetLoader**: Handles loading of all game assets
+- **WeaponSystem**: Implements all 10 Thunder Force 4 weapons
+- **SpriteRenderer**: Handles sprite animation and rendering
+- **CollisionSystem**: Efficient collision detection
+- **ParticleSystem**: Visual effects system
+- **SoundManager**: Audio playback with pooling
+
+### Debug Features
+
+Access debug functions via browser console:
 ```javascript
 window.debugGame.addLife()      // Add an extra life
 window.debugGame.maxPower()     // Max weapon power
@@ -82,74 +103,65 @@ window.debugGame.spawnBoss()    // Spawn boss immediately
 window.debugGame.clearEnemies() // Destroy all enemies on screen
 ```
 
-## Project Structure
+### Adding New Features
+1. Enemies: Add to `ENEMIES` constant and create movement patterns
+2. Weapons: Extend `WeaponSystem` with new firing patterns
+3. Stages: Add to `STAGES` configuration with enemy waves
+4. Effects: Use `ParticleSystem` for new visual effects
 
-```
-thunderforce4/
-├── index.html              # Main HTML file
-├── style.css              # Game styling
-├── src/
-│   ├── main.js            # Entry point
-│   ├── Game.js            # Main game class
-│   ├── entities/          # Game objects
-│   │   ├── GameObject.js  # Base class
-│   │   ├── Player.js      # Player ship
-│   │   ├── Enemy.js       # Enemy ships
-│   │   ├── Bullet.js      # Projectiles
-│   │   ├── PowerUp.js     # Power-up items
-│   │   └── Explosion.js   # Explosion effects
-│   ├── systems/           # Game systems
-│   │   ├── InputManager.js    # Input handling
-│   │   ├── CollisionSystem.js # Collision detection
-│   │   ├── ParticleSystem.js  # Particle effects
-│   │   └── SoundManager.js    # Audio management
-│   ├── scenes/            # Game scenes
-│   │   ├── Scene.js       # Base scene class
-│   │   ├── MenuScene.js   # Main menu
-│   │   ├── GameScene.js   # Main gameplay
-│   │   └── Level1.js      # Level-specific logic
-│   └── utils/             # Utilities
-│       ├── constants.js   # Game constants
-│       └── helpers.js     # Helper functions
-└── assets/               # Game assets (empty)
-    ├── sprites/          # Sprite images
-    ├── audio/            # Sound effects
-    └── backgrounds/      # Background images
-```
+## 🎮 Gameplay Tips
 
-## Customization
+1. **Weapon Selection**: Each weapon has unique advantages
+   - Twin Shot: Balanced forward firepower
+   - Back Shot: Covers front and rear
+   - Rail Gun: Piercing high damage
+   - Hunter: Homing missiles
+   - Wave: Wide coverage
 
-### Adding New Levels
+2. **Speed Control**: Master the 3-speed system
+   - Slow: Precise dodging
+   - Normal: Balanced movement
+   - Fast: Quick positioning
 
-1. Modify the `LEVELS` constant in `constants.js`
-2. Create new level classes extending `GameScene`
-3. Implement custom enemy patterns and backgrounds
+3. **Power-Ups**: Collect wisely
+   - P: Increases weapon power
+   - S: Shield protection
+   - 1UP: Extra life
 
-### Modifying Game Balance
+## 🔧 Browser Compatibility
 
-Edit values in `src/utils/constants.js`:
-- Player stats (speed, lives, etc.)
-- Enemy health and damage
-- Weapon power levels
-- Power-up durations
+- **Chrome**: ✅ Recommended
+- **Firefox**: ✅ Fully supported
+- **Edge**: ✅ Fully supported
+- **Safari**: ⚠️ May have audio issues
+- **Mobile**: ✅ Touch controls supported
 
-## Performance Tips
+## 📝 License
 
-- The game is optimized for 60 FPS
-- Particle effects are limited to prevent slowdown
-- Spatial partitioning is used for collision detection
-- Off-screen objects are automatically removed
+This is a fan-made educational project. Thunder Force IV is owned by Technosoft/Sega. 
+Please support the official releases.
 
-## Known Limitations
+## 🙏 Credits
 
-- Audio files are not included (sound system uses placeholders)
-- Sprite graphics are procedurally drawn (no image assets)
-- Save/Load functionality is basic (localStorage only)
+- Original Game: Technosoft (1992)
+- Music: Takeshi Yoshida, Toshiharu Yamanishi
+- Web Replica: Created with Claude AI assistance
 
-## Credits
+## 🐛 Known Issues
 
-This is a fan-made replica created for educational purposes. Thunder Force IV is owned by Technosoft/SEGA.
+- Sprites may not load without proper asset files
+- Audio requires user interaction to start on some browsers
+- Performance may vary on older devices
 
-## License
+## 🚧 Future Improvements
 
-This project is for educational purposes only. All rights to Thunder Force IV belong to their respective owners. 
+- [ ] All 10 stages from the original
+- [ ] Two-player support
+- [ ] Online leaderboards
+- [ ] More authentic enemy patterns
+- [ ] Options menu with difficulty settings
+- [ ] Stage select after completion
+
+---
+
+**Remember**: This replica requires you to provide your own game assets. See `ASSETS_SETUP.md` for instructions! 

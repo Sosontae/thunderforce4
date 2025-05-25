@@ -45,6 +45,8 @@ body {
     right: 10px;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
     pointer-events: none;
     z-index: 10;
 }
@@ -68,6 +70,14 @@ body {
 
 #power {
     color: #00ff00;
+}
+
+#weapon {
+    color: #ff00ff;
+}
+
+#speed {
+    color: #00ffff;
 }
 
 .screen {
@@ -161,6 +171,63 @@ body {
     animation: loading 1.5s infinite;
 }
 
+/* Controls overlay */
+.controls-help {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border: 2px solid #0ff;
+    border-radius: 10px;
+    padding: 20px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 15;
+    min-width: 250px;
+    display: none;
+}
+
+.controls-help.active {
+    display: block;
+}
+
+.controls-help h3 {
+    color: #0ff;
+    margin-bottom: 15px;
+    text-align: center;
+    text-shadow: 0 0 10px #0ff;
+}
+
+.control-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.control-key {
+    color: #ffff00;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.control-desc {
+    color: #fff;
+    font-size: 12px;
+}
+
+.controls-note {
+    margin-top: 15px;
+    text-align: center;
+    color: #888;
+    font-size: 11px;
+}
+
 /* Responsive */
 @media (max-width: 850px) {
     #game-container {
@@ -171,6 +238,14 @@ body {
 @media (max-width: 750px) {
     #game-container {
         transform: scale(0.7);
+    }
+    
+    .controls-help {
+        bottom: 10px;
+        right: 10px;
+        font-size: 12px;
+        padding: 15px;
+        min-width: 200px;
     }
 }
 

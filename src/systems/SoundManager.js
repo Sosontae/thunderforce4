@@ -23,72 +23,103 @@ class SoundManager {
             return;
         }
 
-        // Create dummy sounds for now (in a real implementation, you'd load actual audio files)
-        this.createDummySounds();
+        // Initialize sounds from loaded assets
+        this.initializeSounds();
         this.initialized = true;
     }
 
-    createDummySounds() {
+    initializeSounds() {
         // Define sound configurations
         const soundConfigs = {
             shoot: { type: 'sfx', pooled: true },
             explosion: { type: 'sfx', pooled: true },
             powerup: { type: 'sfx', pooled: false },
             hit: { type: 'sfx', pooled: true },
-            game_over: { type: 'sfx', pooled: false },
-            level_start: { type: 'sfx', pooled: false },
-            boss_warning: { type: 'sfx', pooled: false },
-            boss_explosion: { type: 'sfx', pooled: false },
-            menu_music: { type: 'music', pooled: false },
-            game_music: { type: 'music', pooled: false },
-            boss_music: { type: 'music', pooled: false }
+            gameOver: { type: 'sfx', pooled: false },
+            levelStart: { type: 'sfx', pooled: false },
+            bossWarning: { type: 'sfx', pooled: false },
+            menuSelect: { type: 'sfx', pooled: false },
+            menuMove: { type: 'sfx', pooled: false },
+            menuMusic: { type: 'music', pooled: false },
+            gameMusic: { type: 'music', pooled: false },
+            bossMusic: { type: 'music', pooled: false }
         };
 
-        // Create sound objects
+        // Create sound objects from loaded assets
         Object.keys(soundConfigs).forEach(soundName => {
             const config = soundConfigs[soundName];
+            const audioElement = window.assetLoader.getAudio(soundName);
+            
+            if (!audioElement) {
+                console.warn(`Audio asset not found: ${soundName}`);
+                return;
+            }
             
             if (config.pooled) {
-                this.createSoundPool(soundName, config.type);
+                this.createSoundPool(soundName, audioElement, config.type);
             } else {
-                this.sounds[soundName] = this.createSound(soundName, config.type);
+                this.sounds[soundName] = this.createSound(soundName, audioElement, config.type);
             }
         });
     }
 
-    createSound(name, type) {
-        // In a real implementation, this would load an actual audio file
-        // For now, we'll create a dummy object
+    createSound(name, audioElement, type) {
+        // Clone the audio element for this sound instance
+        const audio = audioElement.cloneNode();
+        
         return {
             name: name,
             type: type,
+            audio: audio,
             volume: type === 'music' ? this.musicVolume : this.sfxVolume,
             playing: false,
             play: function() {
-                if (this.playing) return;
-                this.playing = true;
-                console.log(`Playing ${type}: ${name}`);
+                if (this.playing && this.type === 'music') return;
                 
-                // Simulate sound duration
-                setTimeout(() => {
-                    this.playing = false;
-                }, type === 'music' ? 0 : 500);
+                this.audio.volume = this.volume;
+                this.audio.currentTime = 0;
+                
+                const playPromise = this.audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        this.playing = true;
+                    }).catch(error => {
+                        console.error(`Error playing ${this.name}:`, error);
+                    });
+                }
             },
             stop: function() {
+                this.audio.pause();
+                this.audio.currentTime = 0;
                 this.playing = false;
-                console.log(`Stopping ${type}: ${name}`);
+            },
+            pause: function() {
+                this.audio.pause();
+                this.playing = false;
             },
             setVolume: function(volume) {
                 this.volume = volume;
+                this.audio.volume = volume;
             }
         };
+        
+        // Set up event listeners
+        audio.addEventListener('ended', () => {
+            if (type === 'music' && this.currentMusic === this.sounds[name]) {
+                // Loop music
+                audio.currentTime = 0;
+                audio.play();
+            } else {
+                this.sounds[name].playing = false;
+            }
+        });
     }
 
-    createSoundPool(name, type) {
+    createSoundPool(name, audioElement, type) {
         this.soundPools[name] = [];
         
         for (let i = 0; i < this.poolSize; i++) {
-            this.soundPools[name].push(this.createSound(name, type));
+            this.soundPools[name].push(this.createSound(name, audioElement, type));
         }
     }
 

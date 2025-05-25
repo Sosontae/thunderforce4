@@ -30,7 +30,7 @@ class MenuScene extends Scene {
         
         // Start menu music
         if (window.soundManager) {
-            window.soundManager.playMusic('menu_music');
+            window.soundManager.playMusic('menuMusic');
         }
     }
 
@@ -64,7 +64,7 @@ class MenuScene extends Scene {
         
         // Start menu music
         if (window.soundManager) {
-            window.soundManager.playMusic('menu_music');
+            window.soundManager.playMusic('menuMusic');
         }
     }
 
@@ -218,7 +218,7 @@ class MenuScene extends Scene {
         
         // Play sound
         if (window.soundManager) {
-            window.soundManager.play('menu_select');
+            window.soundManager.play('menuMove');
         }
     }
 
@@ -239,7 +239,7 @@ class MenuScene extends Scene {
     startGame() {
         // Play sound
         if (window.soundManager) {
-            window.soundManager.play('menu_confirm');
+            window.soundManager.play('menuSelect');
         }
         
         // Transition to game scene

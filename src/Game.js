@@ -152,6 +152,9 @@ class Game {
         if (this.currentScene) {
             this.currentScene.update(deltaTime);
         }
+        
+        // Update input manager's previous keys state
+        this.inputManager.updatePreviousKeys();
     }
 
     render() {
