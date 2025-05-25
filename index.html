@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thunder Force IV Replica</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui-overlay">
+            <div id="score">SCORE: <span id="scoreValue">0</span></div>
+            <div id="lives">LIVES: <span id="livesValue">3</span></div>
+            <div id="power">POWER: <span id="powerValue">0</span>%</div>
+        </div>
+        <div id="menu-screen" class="screen active">
+            <h1>THUNDER FORCE IV</h1>
+            <div class="menu-options">
+                <button id="startButton" class="menu-button">START GAME</button>
+                <button id="optionsButton" class="menu-button">OPTIONS</button>
+                <button id="creditsButton" class="menu-button">CREDITS</button>
+            </div>
+        </div>
+        <div id="game-over-screen" class="screen">
+            <h2>GAME OVER</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button id="restartButton" class="menu-button">RESTART</button>
+        </div>
+    </div>
+
+    <!-- Load game scripts -->
+    <script src="src/utils/constants.js"></script>
+    <script src="src/utils/helpers.js"></script>
+    <script src="src/entities/GameObject.js"></script>
+    <script src="src/entities/Player.js"></script>
+    <script src="src/entities/Enemy.js"></script>
+    <script src="src/entities/Bullet.js"></script>
+    <script src="src/entities/PowerUp.js"></script>
+    <script src="src/entities/Explosion.js"></script>
+    <script src="src/systems/InputManager.js"></script>
+    <script src="src/systems/CollisionSystem.js"></script>
+    <script src="src/systems/ParticleSystem.js"></script>
+    <script src="src/systems/SoundManager.js"></script>
+    <script src="src/scenes/Scene.js"></script>
+    <script src="src/scenes/MenuScene.js"></script>
+    <script src="src/scenes/GameScene.js"></script>
+    <script src="src/scenes/Level1.js"></script>
+    <script src="src/Game.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
+
