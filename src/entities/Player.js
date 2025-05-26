@@ -36,28 +36,10 @@ class Player extends GameObject {
         this.color = '#00ffff';
         this.engineGlow = 0;
         this.trailParticles = [];
+        this.rotation = 0;
+        this.targetRotation = 0;
         
-        // Initialize sprite renderer
-        this.initializeSprite();
-    }
-
-    initializeSprite() {
-        const rynexSprite = window.assetLoader.getSprite('rynex');
-        if (rynexSprite) {
-            this.spriteRenderer = new SpriteRenderer(
-                rynexSprite,
-                SPRITE_CONFIGS.rynex.frameWidth,
-                SPRITE_CONFIGS.rynex.frameHeight
-            );
-            
-            // Define animations
-            Object.entries(SPRITE_CONFIGS.rynex.animations).forEach(([name, config]) => {
-                this.spriteRenderer.defineAnimation(name, config.frames, config.speed);
-            });
-            
-            // Start with idle animation
-            this.spriteRenderer.playAnimation('idle');
-        }
+        // No sprite initialization - we'll use programmatic drawing
     }
 
     update(deltaTime, inputManager) {
@@ -363,46 +345,24 @@ class Player extends GameObject {
             );
         });
 
-        // Draw sprite if available, otherwise use primitive shapes
-        if (this.spriteRenderer) {
-            // Update animation based on movement
-            if (this.vy < 0) {
-                this.spriteRenderer.playAnimation('moveUp');
-            } else if (this.vy > 0) {
-                this.spriteRenderer.playAnimation('moveDown');
-            } else {
-                this.spriteRenderer.playAnimation('idle');
-            }
-            
-            // Update sprite animation
-            this.spriteRenderer.update();
-            
-            // Draw the sprite
-            this.spriteRenderer.draw(ctx, 0, 0, {
-                alpha: this.alpha,
-                scale: this.scale
-            });
-        } else {
-            // Fallback to primitive shapes if sprite not loaded
-            // Draw ship body
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.moveTo(this.width / 2, 0);
-            ctx.lineTo(-this.width / 2, -this.height / 2);
-            ctx.lineTo(-this.width / 4, 0);
-            ctx.lineTo(-this.width / 2, this.height / 2);
-            ctx.closePath();
-            ctx.fill();
+        // Draw ship body
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(this.width / 2, 0);
+        ctx.lineTo(-this.width / 2, -this.height / 2);
+        ctx.lineTo(-this.width / 4, 0);
+        ctx.lineTo(-this.width / 2, this.height / 2);
+        ctx.closePath();
+        ctx.fill();
 
-            // Draw cockpit
-            ctx.fillStyle = '#004466';
-            ctx.beginPath();
-            ctx.moveTo(this.width / 4, 0);
-            ctx.lineTo(-this.width / 4, -this.height / 4);
-            ctx.lineTo(-this.width / 4, this.height / 4);
-            ctx.closePath();
-            ctx.fill();
-        }
+        // Draw cockpit
+        ctx.fillStyle = '#004466';
+        ctx.beginPath();
+        ctx.moveTo(this.width / 4, 0);
+        ctx.lineTo(-this.width / 4, -this.height / 4);
+        ctx.lineTo(-this.width / 4, this.height / 4);
+        ctx.closePath();
+        ctx.fill();
 
         // Draw engine glow
         if (this.engineGlow > 0) {

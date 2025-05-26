@@ -71,7 +71,7 @@ The built files will be in the `dist` directory.
 - Built with vanilla JavaScript (ES6+)
 - HTML5 Canvas for rendering
 - Modular architecture with separate systems for input, sound, particles, etc.
-- Sprite-based graphics with animation support
+- Programmatically drawn graphics with smooth animations
 - Optimized collision detection with spatial partitioning
 - Touch-optimized controls for mobile devices
 

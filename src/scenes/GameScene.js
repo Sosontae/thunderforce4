@@ -132,13 +132,14 @@ class GameScene extends Scene {
             window.soundManager.play('levelStart');
             
             // Play stage-specific music
+            // Using available music tracks as placeholders for different stages
             const stageMusic = {
                 1: 'stage1Music',
-                2: 'stage2Music',
-                3: 'stage3Music',
-                4: 'stage4Music',
-                5: 'stage5Music',
-                8: 'stage8Music'
+                2: 'stage1Music', // Reuse stage1Music
+                3: 'stage1Music', // Reuse stage1Music
+                4: 'stage1Music', // Reuse stage1Music
+                5: 'stage1Music', // Reuse stage1Music
+                8: 'stage1Music'  // Reuse stage1Music
             };
             
             const musicTrack = stageMusic[levelNumber] || 'stage1Music';
@@ -364,17 +365,8 @@ class GameScene extends Scene {
             
             // Change to boss music
             if (window.soundManager) {
-                const bossMusic = {
-                    1: 'stage1BossMusic',
-                    2: 'stage2BossMusic',
-                    3: 'stage3BossMusic',
-                    4: 'stage4BossMusic',
-                    5: 'stage5BossMusic',
-                    10: 'bossMusic' // Final boss
-                };
-                
-                const bossMusicTrack = bossMusic[this.currentLevel] || 'bossMusic';
-                window.soundManager.playMusic(bossMusicTrack);
+                // Use the same boss music for all levels
+                window.soundManager.playMusic('bossMusic');
             }
         }, 2000);
     }

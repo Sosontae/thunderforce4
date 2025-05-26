@@ -128,7 +128,7 @@ const AUDIO = {
     BOSS_WARNING: 'assets/audio/misc_09.ogg',
     MENU_SELECT: 'assets/audio/beep_01.ogg',
     MENU_MOVE: 'assets/audio/terminal_01.ogg',
-    BACKGROUND_LOOP: 'assets/audio/loop_machine_01.ogg'
+            BACKGROUND_LOOP: 'assets/audio/misc_01.ogg' // Using available sound as placeholder
 };
 
 const LEVELS = {

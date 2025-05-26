@@ -4,50 +4,87 @@ class InputManager {
     constructor() {
         this.keys = {};
         this.previousKeys = {};
-        this.touches = [];
         this.mousePosition = { x: 0, y: 0 };
-        this.isMouseDown = false;
+        this.mousePressed = false;
+        this.touches = [];
+        this.isMobile = false;
         
-        // Touch controls state
+        // Touch control zones
+        this.touchZones = {
+            movement: { x: 0, y: 0, width: 0, height: 0 },
+            shooting: { x: 0, y: 0, width: 0, height: 0 }
+        };
+        
+        // Virtual joystick for mobile
         this.virtualJoystick = {
             active: false,
             startX: 0,
             startY: 0,
             currentX: 0,
             currentY: 0,
-            deltaX: 0,
-            deltaY: 0
+            maxRadius: 50
         };
+        
+        // Auto-fire for mobile
+        this.autoFire = false;
         
         this.init();
     }
 
     init() {
+        // Detect mobile
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                        ('ontouchstart' in window) ||
+                        (navigator.maxTouchPoints > 0);
+        
+        // Setup touch zones
+        this.updateTouchZones();
+        
         // Keyboard events
-        window.addEventListener('keydown', (e) => this.handleKeyDown(e));
-        window.addEventListener('keyup', (e) => this.handleKeyUp(e));
+        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+        document.addEventListener('keyup', (e) => this.handleKeyUp(e));
         
         // Mouse events
-        window.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-        window.addEventListener('mouseup', (e) => this.handleMouseUp(e));
-        window.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+        document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+        document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         
-        // Touch events
-        window.addEventListener('touchstart', (e) => this.handleTouchStart(e));
-        window.addEventListener('touchend', (e) => this.handleTouchEnd(e));
-        window.addEventListener('touchmove', (e) => this.handleTouchMove(e));
+        // Touch events with passive: false for better responsiveness
+        const canvas = document.getElementById('gameCanvas');
+        canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+        canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        canvas.addEventListener('touchcancel', (e) => this.handleTouchEnd(e), { passive: false });
         
-        // Prevent default behaviors
-        window.addEventListener('contextmenu', (e) => e.preventDefault());
+        // Window resize
+        window.addEventListener('resize', () => this.updateTouchZones());
+    }
+    
+    updateTouchZones() {
+        const canvas = document.getElementById('gameCanvas');
+        const rect = canvas.getBoundingClientRect();
+        
+        // Left half for movement, right half for shooting
+        this.touchZones.movement = {
+            x: rect.left,
+            y: rect.top,
+            width: rect.width / 2,
+            height: rect.height
+        };
+        
+        this.touchZones.shooting = {
+            x: rect.left + rect.width / 2,
+            y: rect.top,
+            width: rect.width / 2,
+            height: rect.height
+        };
     }
 
     handleKeyDown(event) {
-        // Prevent default for game keys
         if (this.isGameKey(event.code)) {
             event.preventDefault();
+            this.keys[event.code] = true;
         }
-        
-        this.keys[event.code] = true;
     }
 
     handleKeyUp(event) {
@@ -55,12 +92,12 @@ class InputManager {
     }
 
     handleMouseDown(event) {
-        this.isMouseDown = true;
+        this.mousePressed = true;
         this.updateMousePosition(event);
     }
 
     handleMouseUp(event) {
-        this.isMouseDown = false;
+        this.mousePressed = false;
     }
 
     handleMouseMove(event) {
@@ -70,54 +107,64 @@ class InputManager {
     handleTouchStart(event) {
         event.preventDefault();
         
-        // Get canvas bounds for proper touch coordinate mapping
         const canvas = document.getElementById('gameCanvas');
         const rect = canvas.getBoundingClientRect();
         
-        for (let touch of event.changedTouches) {
-            // Convert to canvas coordinates
-            const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        for (let i = 0; i < event.changedTouches.length; i++) {
+            const touch = event.changedTouches[i];
+            const touchX = touch.clientX;
+            const touchY = touch.clientY;
+            
+            // Check which zone the touch is in
+            if (touchX < rect.left + rect.width / 2) {
+                // Movement zone - activate virtual joystick
+                this.virtualJoystick.active = true;
+                this.virtualJoystick.startX = touchX;
+                this.virtualJoystick.startY = touchY;
+                this.virtualJoystick.currentX = touchX;
+                this.virtualJoystick.currentY = touchY;
+            } else {
+                // Shooting zone - start auto-fire
+                this.autoFire = true;
+                this.keys['Space'] = true;
+            }
             
             this.touches.push({
                 id: touch.identifier,
-                x: x,
-                y: y,
-                startX: x,
-                startY: y,
-                clientX: touch.clientX,
-                clientY: touch.clientY
+                x: touchX,
+                y: touchY,
+                startX: touchX,
+                startY: touchY,
+                zone: touchX < rect.left + rect.width / 2 ? 'movement' : 'shooting'
             });
-        }
-        
-        // Initialize virtual joystick with first touch on left side
-        if (this.touches.length > 0 && !this.virtualJoystick.active) {
-            const firstTouch = this.touches[0];
-            // Only create joystick if touch is on left half of screen
-            if (firstTouch.x < canvas.width / 2) {
-                this.virtualJoystick.active = true;
-                this.virtualJoystick.startX = firstTouch.clientX;
-                this.virtualJoystick.startY = firstTouch.clientY;
-                this.virtualJoystick.currentX = firstTouch.clientX;
-                this.virtualJoystick.currentY = firstTouch.clientY;
-            }
         }
     }
 
     handleTouchEnd(event) {
         event.preventDefault();
         
-        for (let touch of event.changedTouches) {
-            const index = this.touches.findIndex(t => t.id === touch.identifier);
-            if (index !== -1) {
-                // Check if this was the joystick touch
-                const touchData = this.touches[index];
-                if (this.virtualJoystick.active && index === 0) {
-                    this.virtualJoystick.active = false;
-                    this.virtualJoystick.deltaX = 0;
-                    this.virtualJoystick.deltaY = 0;
-                }
-                this.touches.splice(index, 1);
+        for (let i = 0; i < event.changedTouches.length; i++) {
+            const touch = event.changedTouches[i];
+            
+            // Remove from touches array
+            this.touches = this.touches.filter(t => t.id !== touch.identifier);
+            
+            // Check if this was the movement touch
+            const wasMovementTouch = this.touches.filter(t => t.zone === 'movement').length === 0;
+            if (wasMovementTouch) {
+                this.virtualJoystick.active = false;
+                // Clear movement keys
+                this.keys['ArrowLeft'] = false;
+                this.keys['ArrowRight'] = false;
+                this.keys['ArrowUp'] = false;
+                this.keys['ArrowDown'] = false;
+            }
+            
+            // Check if this was the shooting touch
+            const wasShootingTouch = this.touches.filter(t => t.zone === 'shooting').length === 0;
+            if (wasShootingTouch) {
+                this.autoFire = false;
+                this.keys['Space'] = false;
             }
         }
     }
@@ -125,41 +172,39 @@ class InputManager {
     handleTouchMove(event) {
         event.preventDefault();
         
-        const canvas = document.getElementById('gameCanvas');
-        const rect = canvas.getBoundingClientRect();
-        
-        for (let touch of event.changedTouches) {
-            const index = this.touches.findIndex(t => t.id === touch.identifier);
-            if (index !== -1) {
-                // Update canvas coordinates
-                const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
-                const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        for (let i = 0; i < event.changedTouches.length; i++) {
+            const touch = event.changedTouches[i];
+            const touchData = this.touches.find(t => t.id === touch.identifier);
+            
+            if (touchData) {
+                touchData.x = touch.clientX;
+                touchData.y = touch.clientY;
                 
-                this.touches[index].x = x;
-                this.touches[index].y = y;
-                this.touches[index].clientX = touch.clientX;
-                this.touches[index].clientY = touch.clientY;
+                // Update virtual joystick if this is the movement touch
+                if (touchData.zone === 'movement' && this.virtualJoystick.active) {
+                    this.virtualJoystick.currentX = touch.clientX;
+                    this.virtualJoystick.currentY = touch.clientY;
+                    
+                    // Calculate joystick offset
+                    const dx = this.virtualJoystick.currentX - this.virtualJoystick.startX;
+                    const dy = this.virtualJoystick.currentY - this.virtualJoystick.startY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Limit to max radius
+                    if (distance > this.virtualJoystick.maxRadius) {
+                        const angle = Math.atan2(dy, dx);
+                        this.virtualJoystick.currentX = this.virtualJoystick.startX + Math.cos(angle) * this.virtualJoystick.maxRadius;
+                        this.virtualJoystick.currentY = this.virtualJoystick.startY + Math.sin(angle) * this.virtualJoystick.maxRadius;
+                    }
+                    
+                    // Update movement keys based on joystick position
+                    const threshold = this.virtualJoystick.maxRadius * 0.3;
+                    this.keys['ArrowLeft'] = dx < -threshold;
+                    this.keys['ArrowRight'] = dx > threshold;
+                    this.keys['ArrowUp'] = dy < -threshold;
+                    this.keys['ArrowDown'] = dy > threshold;
+                }
             }
-        }
-        
-        // Update virtual joystick
-        if (this.virtualJoystick.active && this.touches.length > 0) {
-            const firstTouch = this.touches[0];
-            this.virtualJoystick.currentX = firstTouch.clientX;
-            this.virtualJoystick.currentY = firstTouch.clientY;
-            
-            // Calculate delta with dead zone
-            const maxDelta = 50;
-            const deadZone = 5;
-            let deltaX = (firstTouch.clientX - this.virtualJoystick.startX);
-            let deltaY = (firstTouch.clientY - this.virtualJoystick.startY);
-            
-            // Apply dead zone
-            if (Math.abs(deltaX) < deadZone) deltaX = 0;
-            if (Math.abs(deltaY) < deadZone) deltaY = 0;
-            
-            this.virtualJoystick.deltaX = clamp(deltaX / maxDelta, -1, 1);
-            this.virtualJoystick.deltaY = clamp(deltaY / maxDelta, -1, 1);
         }
     }
 
@@ -174,20 +219,20 @@ class InputManager {
         const gameKeys = [
             'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
             'KeyW', 'KeyA', 'KeyS', 'KeyD',
-            'Space', 'Enter', 'Escape',
-            'KeyZ', 'KeyX', 'KeyC'
+            'Space', 'KeyZ', 'KeyX', 'KeyC',
+            'Escape', 'Enter', 'KeyP'
         ];
         return gameKeys.includes(code);
     }
 
     isKeyPressed(code) {
-        return !!this.keys[code];
+        return this.keys[code] || false;
     }
-    
+
     wasKeyPressed(code) {
-        return !!this.previousKeys[code];
+        return this.previousKeys[code] || false;
     }
-    
+
     isKeyJustPressed(code) {
         return this.isKeyPressed(code) && !this.wasKeyPressed(code);
     }
@@ -199,7 +244,7 @@ class InputManager {
     isAllKeysPressed(...codes) {
         return codes.every(code => this.isKeyPressed(code));
     }
-    
+
     updatePreviousKeys() {
         this.previousKeys = { ...this.keys };
     }
@@ -214,98 +259,74 @@ class InputManager {
         if (this.isKeyPressed('ArrowUp') || this.isKeyPressed('KeyW')) y -= 1;
         if (this.isKeyPressed('ArrowDown') || this.isKeyPressed('KeyS')) y += 1;
         
-        // Touch input (virtual joystick)
-        if (this.virtualJoystick.active) {
-            x += this.virtualJoystick.deltaX;
-            y += this.virtualJoystick.deltaY;
-        }
+        // Virtual joystick input (already handled through key simulation)
         
-        // Normalize if diagonal
+        // Normalize diagonal movement
         if (x !== 0 && y !== 0) {
-            const normalized = normalize(x, y);
-            x = normalized.x;
-            y = normalized.y;
+            const magnitude = Math.sqrt(x * x + y * y);
+            x /= magnitude;
+            y /= magnitude;
         }
         
         return { x, y };
     }
 
     isShooting() {
-        // Keyboard/mouse shooting
-        if (this.isKeyPressed('Space') || 
-            this.isKeyPressed('KeyZ') || 
-            this.isMouseDown) {
-            return true;
-        }
-        
-        // Touch shooting - any touch on right side of screen
-        if (this.touches.length > 0) {
-            const canvas = document.getElementById('gameCanvas');
-            if (canvas) {
-                // Check if any touch is on the right half of the screen
-                return this.touches.some(touch => touch.x > canvas.width / 2);
-            }
-        }
-        
-        return false;
+        return this.isKeyPressed('Space') || 
+               this.isKeyPressed('KeyZ') || 
+               this.mousePressed ||
+               this.autoFire;
     }
 
     isPaused() {
-        return this.isKeyPressed('Escape') || this.isKeyPressed('KeyP');
+        return this.isKeyJustPressed('Escape') || this.isKeyJustPressed('KeyP');
     }
 
     reset() {
         this.keys = {};
+        this.previousKeys = {};
+        this.mousePressed = false;
         this.touches = [];
-        this.isMouseDown = false;
         this.virtualJoystick.active = false;
-        this.virtualJoystick.deltaX = 0;
-        this.virtualJoystick.deltaY = 0;
+        this.autoFire = false;
     }
 
     drawTouchControls(ctx) {
-        if (!this.virtualJoystick.active) return;
+        if (!this.isMobile || this.touches.length === 0) return;
         
         ctx.save();
-        ctx.globalAlpha = 0.3;
         
-        // Draw joystick base
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(
-            this.virtualJoystick.startX,
-            this.virtualJoystick.startY,
-            50,
-            0,
-            Math.PI * 2
-        );
-        ctx.stroke();
-        
-        // Draw joystick knob
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(
-            this.virtualJoystick.currentX,
-            this.virtualJoystick.currentY,
-            20,
-            0,
-            Math.PI * 2
-        );
-        ctx.fill();
-        
-        // Draw shoot indicator
-        if (this.touches.length > 1) {
-            const secondTouch = this.touches[1];
-            ctx.fillStyle = '#ff0000';
+        // Draw virtual joystick if active
+        if (this.virtualJoystick.active) {
+            // Outer circle
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.arc(secondTouch.x, secondTouch.y, 30, 0, Math.PI * 2);
+            ctx.arc(this.virtualJoystick.startX, this.virtualJoystick.startY, 
+                   this.virtualJoystick.maxRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner circle (thumb)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.beginPath();
+            ctx.arc(this.virtualJoystick.currentX, this.virtualJoystick.currentY, 
+                   20, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '20px monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('FIRE', secondTouch.x, secondTouch.y);
+        }
+        
+        // Draw shooting indicator
+        const shootingTouch = this.touches.find(t => t.zone === 'shooting');
+        if (shootingTouch) {
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.arc(shootingTouch.x, shootingTouch.y, 40, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Pulsing effect
+            const pulse = Math.sin(Date.now() * 0.01) * 0.2 + 0.8;
+            ctx.strokeStyle = `rgba(255, 0, 0, ${pulse})`;
+            ctx.lineWidth = 3;
+            ctx.stroke();
         }
         
         ctx.restore();

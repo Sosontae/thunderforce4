@@ -67,6 +67,7 @@ class SoundManager {
         const soundConfigs = {
             // Sound effects
             shoot: { type: 'sfx', pooled: true },
+            laser_beam: { type: 'sfx', pooled: false },
             explosion: { type: 'sfx', pooled: true },
             boss_explosion: { type: 'sfx', pooled: false },
             powerup: { type: 'sfx', pooled: false },
@@ -76,20 +77,13 @@ class SoundManager {
             menuSelect: { type: 'sfx', pooled: false },
             menuMove: { type: 'sfx', pooled: false },
             weaponSwitch: { type: 'sfx', pooled: false },
+            chargeUp: { type: 'sfx', pooled: false },
+            misc1: { type: 'sfx', pooled: false },
+            misc9: { type: 'sfx', pooled: false },
             
             // Music
             menuMusic: { type: 'music', pooled: false },
             stage1Music: { type: 'music', pooled: false },
-            stage1BossMusic: { type: 'music', pooled: false },
-            stage2Music: { type: 'music', pooled: false },
-            stage2BossMusic: { type: 'music', pooled: false },
-            stage3Music: { type: 'music', pooled: false },
-            stage3BossMusic: { type: 'music', pooled: false },
-            stage4Music: { type: 'music', pooled: false },
-            stage4BossMusic: { type: 'music', pooled: false },
-            stage5Music: { type: 'music', pooled: false },
-            stage5BossMusic: { type: 'music', pooled: false },
-            stage8Music: { type: 'music', pooled: false },
             bossMusic: { type: 'music', pooled: false }
         };
 

@@ -34,53 +34,7 @@ class Enemy extends GameObject {
         this.bossPhase = 1;
         this.bossAttackPattern = 0;
         
-        // Initialize sprite
-        this.initializeSprite();
-    }
-    
-    initializeSprite() {
-        const spriteMap = {
-            basic: 'gargoyleDiver',
-            medium: 'faust',
-            heavy: 'armamentClaw',
-            boss: 'evilCore'
-        };
-        
-        const spriteName = spriteMap[this.type];
-        const sprite = window.assetLoader.getSprite(spriteName);
-        
-        if (sprite) {
-            // Get sprite config or use defaults
-            const config = SPRITE_CONFIGS[spriteName] || {
-                frameWidth: this.width,
-                frameHeight: this.height,
-                animations: {
-                    idle: { frames: [0], speed: 100 }
-                }
-            };
-            
-            this.spriteRenderer = new SpriteRenderer(
-                sprite,
-                config.frameWidth,
-                config.frameHeight
-            );
-            
-            // Define animations
-            if (config.animations) {
-                Object.entries(config.animations).forEach(([name, animConfig]) => {
-                    this.spriteRenderer.defineAnimation(
-                        name, 
-                        animConfig.frames, 
-                        animConfig.speed,
-                        animConfig.loop !== false
-                    );
-                });
-                
-                // Start with idle or first animation
-                const firstAnim = Object.keys(config.animations)[0];
-                this.spriteRenderer.playAnimation(firstAnim);
-            }
-        }
+        // No sprite initialization - we'll use programmatic drawing
     }
 
     update(deltaTime, player) {
@@ -345,34 +299,22 @@ class Enemy extends GameObject {
             this.drawHealthBar(ctx);
         }
         
-        // Use sprite if available
-        if (this.spriteRenderer) {
-            // Update sprite animation
-            this.spriteRenderer.update();
-            
-            // Draw the sprite
-            this.spriteRenderer.draw(ctx, 0, 0, {
-                alpha: this.alpha,
-                scale: this.scale
-            });
-        } else {
-            // Fallback to primitive shapes
-            switch (this.type) {
-                case 'basic':
-                    this.drawBasicEnemy(ctx);
-                    break;
-                case 'medium':
-                    this.drawMediumEnemy(ctx);
-                    break;
-                case 'heavy':
-                    this.drawHeavyEnemy(ctx);
-                    break;
-                case 'boss':
-                    this.drawBoss(ctx);
-                    break;
-                default:
-                    super.draw(ctx);
-            }
+        // Draw using programmatic shapes
+        switch (this.type) {
+            case 'basic':
+                this.drawBasicEnemy(ctx);
+                break;
+            case 'medium':
+                this.drawMediumEnemy(ctx);
+                break;
+            case 'heavy':
+                this.drawHeavyEnemy(ctx);
+                break;
+            case 'boss':
+                this.drawBoss(ctx);
+                break;
+            default:
+                super.draw(ctx);
         }
     }
 
