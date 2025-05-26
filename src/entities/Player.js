@@ -349,6 +349,7 @@ class Player extends GameObject {
             // The ship sprite sheet is 80x48 with 5 frames (each 16x48 pixels)
             const frameWidth = 16;
             const frameHeight = 48;
+            const framesPerRow = 5;
             
             // Use animated frame based on movement
             let frame = 2; // Default middle frame
@@ -364,15 +365,20 @@ class Player extends GameObject {
                 frame = 2; // Center when not moving vertically
             }
             
-            // Use animated sprite method for sprite sheet
-            window.spriteManager.drawAnimatedSprite(ctx, 'player.ship', 0, 0, frame, {
+            // Calculate frame position in sprite sheet
+            const frameX = frame * frameWidth;
+            const frameY = 0;
+            
+            // Draw the sprite frame
+            window.spriteManager.drawSprite(ctx, 'player.ship', 0, 0, {
                 scale: 1.5, // Scale for visibility
                 alpha: this.alpha,
                 centered: true,
-                framesPerRow: 5,
+                frameX: frameX,
+                frameY: frameY,
                 frameWidth: frameWidth,
                 frameHeight: frameHeight,
-                flipY: false // Don't flip the player sprite
+                flipY: false
             });
             
             // Draw engine glow effect

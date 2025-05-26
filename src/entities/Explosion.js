@@ -8,6 +8,7 @@ class Explosion extends GameObject {
         this.color = color;
         this.lifetime = 300;
         this.age = 0;
+        this.animationProgress = 0;
         this.particles = [];
         
         // Create explosion particles
@@ -43,73 +44,69 @@ class Explosion extends GameObject {
 
     update(deltaTime) {
         if (!this.active) return;
-        
+
         this.age += deltaTime;
+        this.animationProgress = this.age / this.lifetime;
         
-        // Update main explosion
-        const progress = this.age / this.lifetime;
-        this.scale = easeOutCubic(progress) * 2;
-        this.alpha = 1 - easeInQuad(progress);
-        
+        if (this.age >= this.lifetime) {
+            this.destroy();
+            return;
+        }
+
         // Update particles
         this.particles.forEach(particle => {
-            particle.age += deltaTime;
             particle.x += particle.vx * (deltaTime / 16);
             particle.y += particle.vy * (deltaTime / 16);
             particle.vx *= 0.98;
             particle.vy *= 0.98;
-            
-            const particleProgress = particle.age / particle.lifetime;
-            particle.size = particle.maxSize * (1 - particleProgress);
+            particle.size *= 0.95;
+            particle.age += deltaTime;
+            particle.alpha = 1 - (particle.age / particle.lifetime);
         });
-        
+
         // Remove dead particles
         this.particles = this.particles.filter(p => p.age < p.lifetime);
-        
-        // Destroy explosion when done
-        if (this.age >= this.lifetime && this.particles.length === 0) {
-            this.destroy();
-        }
+
+        // Update alpha
+        this.alpha = 1 - (this.age / this.lifetime);
     }
 
     draw(ctx) {
-        // Draw particles
-        this.particles.forEach(particle => {
-            const particleAlpha = 1 - (particle.age / particle.lifetime);
-            ctx.fillStyle = fadeColor(particle.color, particleAlpha);
-            ctx.fillRect(
-                particle.x - particle.size / 2,
-                particle.y - particle.size / 2,
-                particle.size,
-                particle.size
-            );
-        });
-        
-        // Draw main explosion flash
-        if (this.age < this.lifetime / 3) {
-            const flashProgress = this.age / (this.lifetime / 3);
-            const flashSize = this.maxSize * (1 + flashProgress);
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, flashSize);
+        if (window.spriteManager && window.spriteManager.loaded) {
+            // The explosion sprite sheet is 80x16 with 5 frames (each 16x16 pixels)
+            const frameWidth = 16;
+            const frameHeight = 16;
+            const totalFrames = 5;
             
-            gradient.addColorStop(0, fadeColor('#ffffff', (1 - flashProgress) * 0.8));
-            gradient.addColorStop(0.3, fadeColor(this.color, (1 - flashProgress) * 0.6));
-            gradient.addColorStop(1, 'transparent');
+            // Calculate current frame based on animation progress
+            const frame = Math.floor(this.animationProgress * totalFrames);
+            if (frame >= totalFrames) return; // Animation complete
             
-            ctx.fillStyle = gradient;
-            ctx.fillRect(-flashSize, -flashSize, flashSize * 2, flashSize * 2);
-        }
-        
-        // Draw explosion ring
-        if (this.age < this.lifetime * 0.7) {
-            const ringProgress = this.age / (this.lifetime * 0.7);
-            const ringRadius = this.maxSize * ringProgress * 1.5;
-            const ringAlpha = (1 - ringProgress) * 0.5;
+            const frameX = frame * frameWidth;
+            const frameY = 0;
             
-            ctx.strokeStyle = fadeColor(this.color, ringAlpha);
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
-            ctx.stroke();
+            // Draw explosion sprite
+            window.spriteManager.drawSprite(ctx, 'effects.explosion', 0, 0, {
+                scale: this.size / 8, // Scale based on explosion size
+                alpha: this.alpha,
+                centered: true,
+                frameX: frameX,
+                frameY: frameY,
+                frameWidth: frameWidth,
+                frameHeight: frameHeight,
+                flipY: false
+            });
+        } else {
+            // Fallback to particle-based explosion
+            this.particles.forEach(particle => {
+                ctx.fillStyle = fadeColor(particle.color, particle.alpha);
+                ctx.fillRect(
+                    particle.x - this.x - particle.size / 2,
+                    particle.y - this.y - particle.size / 2,
+                    particle.size,
+                    particle.size
+                );
+            });
         }
     }
 }

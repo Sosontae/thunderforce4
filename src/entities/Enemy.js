@@ -535,16 +535,19 @@ class Enemy extends GameObject {
             
             // Calculate current frame based on time
             const frame = Math.floor(Date.now() / animationSpeed) % totalFrames;
+            const frameX = frame * frameWidth;
+            const frameY = 0;
             
-            // Draw the sprite
-            window.spriteManager.drawAnimatedSprite(ctx, spriteName, 0, 0, frame, {
+            // Draw the sprite frame
+            window.spriteManager.drawSprite(ctx, spriteName, 0, 0, {
                 scale: scale,
                 alpha: this.alpha,
                 centered: true,
-                framesPerRow: totalFrames,
+                frameX: frameX,
+                frameY: frameY,
                 frameWidth: frameWidth,
                 frameHeight: frameHeight,
-                flipY: false // Don't flip vertically
+                flipY: false
             });
         } else {
             // Fallback to programmatic drawing if sprites not loaded

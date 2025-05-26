@@ -193,54 +193,53 @@ class PowerUp extends GameObject {
     draw(ctx) {
         const time = Date.now() * 0.001;
         
-        // Rotation effect
-        ctx.rotate(time);
-        
         // Draw power-up sprite if available
         if (window.spriteManager && window.spriteManager.loaded) {
             // The powerup sprite is a single 32x32 image, not a sprite sheet
-            // Draw the base powerup sprite
+            // Draw the base powerup sprite with rotation effect
+            const rotationTime = Date.now() * 0.001;
+            
             window.spriteManager.drawSprite(ctx, 'powerups.powerup', 0, 0, {
                 scale: 1.5,
                 alpha: this.alpha * 0.8,
                 centered: true,
-                flipY: false
+                flipY: false,
+                rotation: rotationTime
             });
             
             // Draw type-specific icon on top
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 16px monospace';
+            ctx.save();
+            ctx.rotate(-rotationTime); // Counter-rotate the text
+            ctx.fillStyle = this.getColor();
+            ctx.font = 'bold 14px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
             switch(this.type) {
                 case POWERUPS.TYPES.WEAPON_UPGRADE:
-                    ctx.fillStyle = '#ffff00';
                     ctx.fillText('W', 0, 0);
                     break;
                 case POWERUPS.TYPES.SHIELD:
-                    ctx.fillStyle = '#00ffff';
                     ctx.fillText('S', 0, 0);
                     break;
                 case POWERUPS.TYPES.SPEED_BOOST:
-                    ctx.fillStyle = '#ff00ff';
                     ctx.fillText('»', 0, 0);
                     break;
                 case POWERUPS.TYPES.EXTRA_LIFE:
-                    ctx.fillStyle = '#00ff00';
+                    ctx.font = 'bold 10px monospace';
                     ctx.fillText('1UP', 0, 0);
                     break;
                 case POWERUPS.TYPES.BOMB:
-                    ctx.fillStyle = '#ff0000';
                     ctx.fillText('B', 0, 0);
                     break;
             }
+            ctx.restore();
             
             // Add glow effect
             const glowSize = this.width + Math.sin(time * 3) * 5;
             const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
-            gradient.addColorStop(0, fadeColor(this.getColor(), 0.8));
-            gradient.addColorStop(0.5, fadeColor(this.getColor(), 0.3));
+            gradient.addColorStop(0, fadeColor(this.getColor(), 0.6));
+            gradient.addColorStop(0.5, fadeColor(this.getColor(), 0.2));
             gradient.addColorStop(1, 'transparent');
             
             ctx.fillStyle = gradient;

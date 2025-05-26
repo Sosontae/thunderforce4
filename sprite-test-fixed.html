@@ -81,11 +81,13 @@
             
             const playerBanking = Math.sin(Date.now() * 0.001) * 2;
             const playerFrame = playerBanking < -1 ? 3 : playerBanking < 0 ? 1 : playerBanking > 1 ? 4 : playerBanking > 0 ? 0 : 2;
+            const playerFrameX = playerFrame * 16;
             
-            window.spriteManager.drawAnimatedSprite(ctx, 'player.ship', x, y, playerFrame, {
+            window.spriteManager.drawSprite(ctx, 'player.ship', x, y, {
                 scale: 2,
                 centered: true,
-                framesPerRow: 5,
+                frameX: playerFrameX,
+                frameY: 0,
                 frameWidth: 16,
                 frameHeight: 48,
                 flipY: false
@@ -101,10 +103,11 @@
             ctx.restore();
             
             const frame1 = Math.floor(Date.now() / 150) % 2;
-            window.spriteManager.drawAnimatedSprite(ctx, 'enemies.small', x, y, frame1, {
+            window.spriteManager.drawSprite(ctx, 'enemies.small', x, y, {
                 scale: 2,
                 centered: true,
-                framesPerRow: 2,
+                frameX: frame1 * 16,
+                frameY: 0,
                 frameWidth: 16,
                 frameHeight: 16,
                 flipY: false
@@ -118,10 +121,11 @@
             ctx.restore();
             
             const frame2 = Math.floor(Date.now() / 300) % 2;
-            window.spriteManager.drawAnimatedSprite(ctx, 'enemies.medium', x, y, frame2, {
+            window.spriteManager.drawSprite(ctx, 'enemies.medium', x, y, {
                 scale: 1.5,
                 centered: true,
-                framesPerRow: 2,
+                frameX: frame2 * 32,
+                frameY: 0,
                 frameWidth: 32,
                 frameHeight: 16,
                 flipY: false
@@ -135,10 +139,11 @@
             ctx.restore();
             
             const frame3 = Math.floor(Date.now() / 400) % 2;
-            window.spriteManager.drawAnimatedSprite(ctx, 'enemies.big', x, y, frame3, {
+            window.spriteManager.drawSprite(ctx, 'enemies.big', x, y, {
                 scale: 1.7,
                 centered: true,
-                framesPerRow: 2,
+                frameX: frame3 * 32,
+                frameY: 0,
                 frameWidth: 32,
                 frameHeight: 32,
                 flipY: false
@@ -197,18 +202,20 @@
                 ctx.fillText(powerup.name, -25, 30);
                 ctx.restore();
                 
-                // Draw base powerup
+                // Draw base powerup with rotation
+                const rotation = Date.now() * 0.001 + i;
                 window.spriteManager.drawSprite(ctx, 'powerups.powerup', px, y, {
                     scale: 1.5,
                     centered: true,
-                    flipY: false
+                    flipY: false,
+                    rotation: rotation
                 });
                 
                 // Draw icon
                 ctx.save();
                 ctx.translate(px, y);
                 ctx.fillStyle = powerup.color;
-                ctx.font = 'bold 16px monospace';
+                ctx.font = i === 3 ? 'bold 10px monospace' : 'bold 14px monospace';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(powerup.type, 0, 0);
@@ -224,21 +231,25 @@
             ctx.fillText('Boss:', -30, -40);
             ctx.restore();
             
+            const time = Date.now() * 0.001;
+            const pulseScale = 0.6 + Math.sin(time * 2) * 0.05;
+            
             window.spriteManager.drawSprite(ctx, 'enemies.biomech', x, y, {
-                scale: 0.6,
+                scale: pulseScale,
                 centered: true,
                 flipY: false
             });
             
-            // Add glow effect
+            // Add rotating shield effect
             ctx.save();
             ctx.translate(x, y);
-            ctx.shadowColor = '#ff0000';
-            ctx.shadowBlur = 20;
-            ctx.fillStyle = 'rgba(255,0,0,0.2)';
+            ctx.rotate(time);
+            ctx.strokeStyle = `rgba(255,0,0,${0.3 + Math.sin(time * 3) * 0.2})`;
+            ctx.lineWidth = 3;
+            ctx.setLineDash([10, 5]);
             ctx.beginPath();
-            ctx.arc(0, 0, 50, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.arc(0, 0, 60, 0, Math.PI * 2);
+            ctx.stroke();
             ctx.restore();
             
             // Continue animation

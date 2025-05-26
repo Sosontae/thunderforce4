@@ -184,10 +184,11 @@ class SpriteManager {
         ctx.rotate(rotation);
         ctx.scale(scaleX, scaleY);
         
+        // Draw only the specified frame from the sprite sheet
         ctx.drawImage(
             sprite,
-            frameX, frameY, frameWidth, frameHeight,
-            -frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight
+            frameX, frameY, frameWidth, frameHeight,  // Source rectangle
+            -frameWidth / 2, -frameHeight / 2, frameWidth, frameHeight  // Destination rectangle
         );
         
         ctx.restore();
