@@ -1,12 +1,12 @@
 {
   "name": "thunderforce4-replica",
   "version": "1.0.0",
-  "description": "A faithful web-based replica of Thunder Force IV",
+  "description": "A web-based replica of Thunder Force IV",
   "main": "index.html",
   "scripts": {
     "start": "npx http-server -p 8080 -c-1",
     "dev": "npx live-server --port=8080",
-    "convert-audio": "echo 'Convert MP3 to OGG: ffmpeg -i input.mp3 -c:a libvorbis -q:a 4 output.ogg'"
+    "build": "echo 'No build step required - vanilla JS project'"
   },
   "keywords": [
     "thunder-force",

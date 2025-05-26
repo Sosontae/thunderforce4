@@ -204,12 +204,10 @@ const SPRITE_CONFIGS = {
         }
     },
     explosionSet: {
-        frameWidth: 128,
-        frameHeight: 128,
+        frameWidth: 64,
+        frameHeight: 64,
         animations: {
-            small: { frames: [0, 1, 2, 3], speed: 60, loop: false },
-            medium: { frames: [4, 5, 6, 7, 8, 9], speed: 50, loop: false },
-            large: { frames: [10, 11, 12, 13, 14, 15], speed: 40, loop: false }
+            explode: { frames: [0, 1, 2, 3, 4, 5, 6, 7], speed: 50, loop: false }
         }
     }
 }; 

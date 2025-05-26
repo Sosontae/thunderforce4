@@ -70,24 +70,37 @@ class InputManager {
     handleTouchStart(event) {
         event.preventDefault();
         
+        // Get canvas bounds for proper touch coordinate mapping
+        const canvas = document.getElementById('gameCanvas');
+        const rect = canvas.getBoundingClientRect();
+        
         for (let touch of event.changedTouches) {
+            // Convert to canvas coordinates
+            const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+            
             this.touches.push({
                 id: touch.identifier,
-                x: touch.clientX,
-                y: touch.clientY,
-                startX: touch.clientX,
-                startY: touch.clientY
+                x: x,
+                y: y,
+                startX: x,
+                startY: y,
+                clientX: touch.clientX,
+                clientY: touch.clientY
             });
         }
         
-        // Initialize virtual joystick with first touch
+        // Initialize virtual joystick with first touch on left side
         if (this.touches.length > 0 && !this.virtualJoystick.active) {
             const firstTouch = this.touches[0];
-            this.virtualJoystick.active = true;
-            this.virtualJoystick.startX = firstTouch.x;
-            this.virtualJoystick.startY = firstTouch.y;
-            this.virtualJoystick.currentX = firstTouch.x;
-            this.virtualJoystick.currentY = firstTouch.y;
+            // Only create joystick if touch is on left half of screen
+            if (firstTouch.x < canvas.width / 2) {
+                this.virtualJoystick.active = true;
+                this.virtualJoystick.startX = firstTouch.clientX;
+                this.virtualJoystick.startY = firstTouch.clientY;
+                this.virtualJoystick.currentX = firstTouch.clientX;
+                this.virtualJoystick.currentY = firstTouch.clientY;
+            }
         }
     }
 
@@ -97,45 +110,56 @@ class InputManager {
         for (let touch of event.changedTouches) {
             const index = this.touches.findIndex(t => t.id === touch.identifier);
             if (index !== -1) {
+                // Check if this was the joystick touch
+                const touchData = this.touches[index];
+                if (this.virtualJoystick.active && index === 0) {
+                    this.virtualJoystick.active = false;
+                    this.virtualJoystick.deltaX = 0;
+                    this.virtualJoystick.deltaY = 0;
+                }
                 this.touches.splice(index, 1);
             }
-        }
-        
-        // Deactivate virtual joystick when no touches
-        if (this.touches.length === 0) {
-            this.virtualJoystick.active = false;
-            this.virtualJoystick.deltaX = 0;
-            this.virtualJoystick.deltaY = 0;
         }
     }
 
     handleTouchMove(event) {
         event.preventDefault();
         
+        const canvas = document.getElementById('gameCanvas');
+        const rect = canvas.getBoundingClientRect();
+        
         for (let touch of event.changedTouches) {
             const index = this.touches.findIndex(t => t.id === touch.identifier);
             if (index !== -1) {
-                this.touches[index].x = touch.clientX;
-                this.touches[index].y = touch.clientY;
+                // Update canvas coordinates
+                const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
+                const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+                
+                this.touches[index].x = x;
+                this.touches[index].y = y;
+                this.touches[index].clientX = touch.clientX;
+                this.touches[index].clientY = touch.clientY;
             }
         }
         
         // Update virtual joystick
         if (this.virtualJoystick.active && this.touches.length > 0) {
             const firstTouch = this.touches[0];
-            this.virtualJoystick.currentX = firstTouch.x;
-            this.virtualJoystick.currentY = firstTouch.y;
+            this.virtualJoystick.currentX = firstTouch.clientX;
+            this.virtualJoystick.currentY = firstTouch.clientY;
             
-            // Calculate delta
+            // Calculate delta with dead zone
             const maxDelta = 50;
-            this.virtualJoystick.deltaX = clamp(
-                (firstTouch.x - this.virtualJoystick.startX) / maxDelta,
-                -1, 1
-            );
-            this.virtualJoystick.deltaY = clamp(
-                (firstTouch.y - this.virtualJoystick.startY) / maxDelta,
-                -1, 1
-            );
+            const deadZone = 5;
+            let deltaX = (firstTouch.clientX - this.virtualJoystick.startX);
+            let deltaY = (firstTouch.clientY - this.virtualJoystick.startY);
+            
+            // Apply dead zone
+            if (Math.abs(deltaX) < deadZone) deltaX = 0;
+            if (Math.abs(deltaY) < deadZone) deltaY = 0;
+            
+            this.virtualJoystick.deltaX = clamp(deltaX / maxDelta, -1, 1);
+            this.virtualJoystick.deltaY = clamp(deltaY / maxDelta, -1, 1);
         }
     }
 
@@ -207,10 +231,23 @@ class InputManager {
     }
 
     isShooting() {
-        return this.isKeyPressed('Space') || 
-               this.isKeyPressed('KeyZ') || 
-               this.isMouseDown ||
-               (this.touches.length > 1); // Two-finger touch for shooting
+        // Keyboard/mouse shooting
+        if (this.isKeyPressed('Space') || 
+            this.isKeyPressed('KeyZ') || 
+            this.isMouseDown) {
+            return true;
+        }
+        
+        // Touch shooting - any touch on right side of screen
+        if (this.touches.length > 0) {
+            const canvas = document.getElementById('gameCanvas');
+            if (canvas) {
+                // Check if any touch is on the right half of the screen
+                return this.touches.some(touch => touch.x > canvas.width / 2);
+            }
+        }
+        
+        return false;
     }
 
     isPaused() {

@@ -47,6 +47,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Setup keyboard shortcuts
 function setupKeyboardShortcuts(game) {
+    // Fullscreen button handler
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', () => {
+            game.toggleFullscreen();
+        });
+    }
+    
     document.addEventListener('keydown', (e) => {
         // Toggle controls help with F1
         if (e.key === 'F1') {
@@ -175,9 +183,14 @@ function showErrorMessage(message) {
 
 // Mobile detection and setup
 function setupMobileControls() {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                     ('ontouchstart' in window) ||
+                     (navigator.maxTouchPoints > 0);
     
     if (isMobile) {
+        // Add mobile class to body for CSS styling
+        document.body.classList.add('mobile');
+        
         // Add touch instructions
         const instructions = document.createElement('div');
         instructions.style.cssText = `
@@ -190,10 +203,11 @@ function setupMobileControls() {
             font-family: 'Courier New', monospace;
             text-align: center;
             background-color: rgba(0, 0, 0, 0.7);
-            padding: 10px;
+            padding: 10px 20px;
             border-radius: 5px;
             pointer-events: none;
             z-index: 100;
+            border: 1px solid #00ffff;
         `;
         instructions.innerHTML = 'Touch left side to move • Touch right side to shoot';
         
@@ -208,7 +222,26 @@ function setupMobileControls() {
                 instructions.remove();
             }, 1000);
         }, 5000);
+        
+        // Prevent default touch behaviors
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.id === 'gameCanvas') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Prevent double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     }
+    
+    return isMobile;
 }
 
 // Call mobile setup

@@ -27,16 +27,10 @@ class AssetLoader {
                 faust: 'assets/sprites/faust.png',
                 armamentClaw: 'assets/sprites/armament_claw.png',
                 evilCore: 'assets/sprites/evil_core.png',
-                hellArm: 'assets/sprites/hell_arm.png',
-                rattCarry: 'assets/sprites/ratt_carry.png',
-                sparkLancer: 'assets/sprites/spark_lancer.png',
-                versus: 'assets/sprites/versus.png',
                 
                 // Effects
                 bulletCollection: 'assets/sprites/bullet_collection.png',
-                explosionSet: 'assets/sprites/explosion_set2.png',
-                pixelExplosion: 'assets/sprites/pixel_explosion.png',
-                simpleExplosion: 'assets/sprites/simple_explosion.png',
+                explosionSet: 'assets/sprites/explosion_set.png',
                 
                 // Power-ups
                 powerupWeapon: 'assets/sprites/powerup_weapon.png',
@@ -49,11 +43,8 @@ class AssetLoader {
             audio: {
                 // Sound effects
                 shoot: 'assets/audio/laser1.wav',
-                shootAlt: 'assets/audio/shoot_01.ogg',
                 explosion: 'assets/audio/explosion_01.ogg',
-                explosionAlt: 'assets/audio/retro_explosion.ogg',
                 powerup: 'assets/audio/powerup.ogg',
-                hit: 'assets/audio/retro_laser_01.ogg',
                 gameOver: 'assets/audio/dead_end.ogg',
                 levelStart: 'assets/audio/misc_01.ogg',
                 bossWarning: 'assets/audio/misc_09.ogg',
@@ -62,24 +53,20 @@ class AssetLoader {
                 weaponSwitch: 'assets/audio/weapon_switch.ogg',
                 boss_explosion: 'assets/audio/boss_explosion.ogg',
                 
-                // Thunder Force 4 Music Tracks - Fallback to generated sounds for now
-                opening: 'assets/audio/charge_up.ogg', // Using charge up as opening
-                menuMusic: 'assets/audio/charge_up.ogg', // Menu music fallback
-                stageSelect: 'assets/audio/beep_01.ogg', // Stage select fallback
-                stage1Music: 'assets/audio/laser_beam.ogg', // Stage 1 fallback
-                stage1BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
-                stage2Music: 'assets/audio/laser_beam.ogg', // Stage 2 fallback
-                stage2BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
-                stage3Music: 'assets/audio/laser_beam.ogg', // Stage 3 fallback
-                stage3BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
-                stage4Music: 'assets/audio/laser_beam.ogg', // Stage 4 fallback
-                stage4BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
-                stage5Music: 'assets/audio/laser_beam.ogg', // Stage 5 fallback
-                stage5BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
-                stage8Music: 'assets/audio/laser_beam.ogg', // Stage 8 fallback
-                bossMusic: 'assets/audio/boss_explosion.ogg', // Final Boss fallback
-                endingMusic: 'assets/audio/charge_up.ogg', // Ending fallback
-                gameMusic: 'assets/audio/laser_beam.ogg' // Default game music fallback
+                // Music tracks - Using available sounds as placeholders
+                menuMusic: 'assets/audio/charge_up.ogg',
+                stage1Music: 'assets/audio/laser_beam.ogg',
+                stage1BossMusic: 'assets/audio/boss_explosion.ogg',
+                stage2Music: 'assets/audio/laser_beam.ogg',
+                stage2BossMusic: 'assets/audio/boss_explosion.ogg',
+                stage3Music: 'assets/audio/laser_beam.ogg',
+                stage3BossMusic: 'assets/audio/boss_explosion.ogg',
+                stage4Music: 'assets/audio/laser_beam.ogg',
+                stage4BossMusic: 'assets/audio/boss_explosion.ogg',
+                stage5Music: 'assets/audio/laser_beam.ogg',
+                stage5BossMusic: 'assets/audio/boss_explosion.ogg',
+                stage8Music: 'assets/audio/laser_beam.ogg',
+                bossMusic: 'assets/audio/boss_explosion.ogg'
             },
             
             backgrounds: {

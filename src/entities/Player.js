@@ -4,10 +4,10 @@ class Player extends GameObject {
     constructor(x, y) {
         super(x, y, PLAYER.WIDTH, PLAYER.HEIGHT);
         
-        // Player stats
-        this.lives = PLAYER.INITIAL_LIVES;
+        // Player stats - Start with 5 lives and full power
+        this.lives = 5;
         this.score = 0;
-        this.weaponLevel = 1;
+        this.weaponLevel = WEAPONS.MAX_LEVEL; // Start with full power
         this.speed = PLAYER.SPEED;
         this.maxSpeed = PLAYER.MAX_SPEED;
         
