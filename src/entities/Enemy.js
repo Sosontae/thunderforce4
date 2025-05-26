@@ -304,7 +304,7 @@ class Enemy extends GameObject {
         // Draw enemy sprite if available
         if (window.spriteManager && window.spriteManager.loaded) {
             let spriteName;
-            let frameWidth, frameHeight, frame = 0, framesPerRow = 1, scale = 1;
+            let frameWidth, frameHeight, framesPerRow = 1, scale = 1;
             
             // Choose sprite and dimensions based on enemy type
             switch(this.type) {
@@ -316,7 +316,6 @@ class Enemy extends GameObject {
                     spriteName = 'enemies.big';
                     frameWidth = 32;
                     frameHeight = 32;
-                    frame = Math.floor(Date.now() / 200) % 6; // Animate through 6 frames
                     framesPerRow = 6;
                     scale = 2;
                     break;
@@ -324,7 +323,6 @@ class Enemy extends GameObject {
                     spriteName = 'enemies.medium';
                     frameWidth = 32;
                     frameHeight = 16;
-                    frame = Math.floor(Date.now() / 200) % 6; // Animate through 6 frames
                     framesPerRow = 6;
                     scale = 1.5;
                     break;
@@ -333,7 +331,6 @@ class Enemy extends GameObject {
                     spriteName = 'enemies.small';
                     frameWidth = 16;
                     frameHeight = 16;
-                    frame = Math.floor(Date.now() / 200) % 6; // Animate through 6 frames
                     framesPerRow = 6;
                     scale = 2;
                     break;
@@ -341,21 +338,24 @@ class Enemy extends GameObject {
             
             // Draw the sprite
             if (frameWidth && frameHeight) {
-                // Use animated sprite for sprite sheets
-                window.spriteManager.drawAnimatedSprite(ctx, spriteName, 0, 0, frame, {
+                // Use animated sprite for sprite sheets with automatic animation
+                window.spriteManager.drawAnimatedSprite(ctx, spriteName, 0, 0, -1, {
                     scale: scale,
                     alpha: this.alpha,
                     centered: true,
                     framesPerRow: framesPerRow,
                     frameWidth: frameWidth,
-                    frameHeight: frameHeight
+                    frameHeight: frameHeight,
+                    animationSpeed: 150, // 150ms per frame
+                    flipY: true // Flip vertically to correct orientation
                 });
             } else {
                 // Use regular sprite for single images
                 window.spriteManager.drawSprite(ctx, spriteName, 0, 0, {
                     scale: scale,
                     alpha: this.alpha,
-                    centered: true
+                    centered: true,
+                    flipY: true // Flip vertically to correct orientation
                 });
             }
             

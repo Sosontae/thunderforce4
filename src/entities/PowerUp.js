@@ -201,6 +201,7 @@ class PowerUp extends GameObject {
             // The powerup sprite sheet has 4 frames, each 16x16 pixels
             const frameWidth = 16;
             const frameHeight = 16;
+            
             // Choose frame based on powerup type
             let frame = 0;
             switch(this.type) {
@@ -226,7 +227,8 @@ class PowerUp extends GameObject {
                 centered: true,
                 framesPerRow: 4,
                 frameWidth: frameWidth,
-                frameHeight: frameHeight
+                frameHeight: frameHeight,
+                flipY: true // Flip vertically to correct orientation
             });
             
             // Add glow effect

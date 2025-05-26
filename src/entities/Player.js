@@ -131,7 +131,6 @@ class Player extends GameObject {
         
         // Check if inputManager exists
         if (!inputManager) {
-            console.warn('InputManager not available');
             return;
         }
         
@@ -350,7 +349,12 @@ class Player extends GameObject {
             // The ship sprite sheet has 5 frames, each 16x24 pixels
             const frameWidth = 16;
             const frameHeight = 24;
-            const frame = 2; // Use middle frame (0-4 available)
+            
+            // Use animated frame based on movement
+            let frame = 2; // Default middle frame
+            if (this.vy < 0) frame = 0; // Moving up
+            else if (this.vy > 0) frame = 4; // Moving down
+            else if (this.vx !== 0) frame = 1 + Math.floor(Date.now() / 200) % 2; // Moving horizontally, animate between frames 1 and 2
             
             // Use animated sprite method for sprite sheet
             window.spriteManager.drawAnimatedSprite(ctx, 'player.ship', 0, 0, frame, {
@@ -358,9 +362,9 @@ class Player extends GameObject {
                 alpha: this.alpha,
                 centered: true,
                 framesPerRow: 5,
-                frameSize: frameWidth,
                 frameWidth: frameWidth,
-                frameHeight: frameHeight
+                frameHeight: frameHeight,
+                flipY: true // Flip vertically to correct orientation
             });
             
             // Draw engine glow effect

@@ -80,6 +80,13 @@ const ENEMIES = {
     }
 };
 
+const ENEMY_TYPES = {
+    BASIC: 'basic',
+    MEDIUM: 'medium', 
+    HEAVY: 'heavy',
+    BOSS: 'boss'
+};
+
 const POWERUPS = {
     TYPES: {
         WEAPON_UPGRADE: 'weapon_upgrade',

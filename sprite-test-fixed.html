@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sprite Test - Fixed</title>
+    <style>
+        body { 
+            background: #222; 
+            color: white; 
+            font-family: monospace;
+            padding: 20px;
+        }
+        canvas { 
+            border: 1px solid #666; 
+            display: block;
+            margin: 20px 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #444;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>Thunder Force IV - Sprite Test (Fixed)</h1>
+    <div id="status">Loading...</div>
+    <div class="test-section">
+        <h3>Sprite Animation Test</h3>
+        <canvas id="testCanvas" width="800" height="400"></canvas>
+    </div>
+    
+    <script src="src/utils/constants.js"></script>
+    <script src="src/utils/helpers.js"></script>
+    <script src="src/systems/SpriteManager.js"></script>
+    
+    <script>
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusDiv = document.getElementById('status');
+        
+        async function testSprites() {
+            console.log('Starting sprite test...');
+            
+            try {
+                const success = await window.spriteManager.loadAll();
+                
+                if (success) {
+                    statusDiv.innerHTML = '<span class="success">✓ Sprites loaded successfully!</span>';
+                    
+                    // Start animation loop
+                    animate();
+                } else {
+                    statusDiv.innerHTML = '<span class="error">✗ Failed to load sprites</span>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+                console.error('Sprite test error:', error);
+            }
+        }
+        
+        function animate() {
+            // Clear canvas
+            ctx.fillStyle = '#000033';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw title
+            ctx.fillStyle = 'white';
+            ctx.font = '16px monospace';
+            ctx.fillText('Animated Sprites Test (Flipped to correct orientation)', 20, 30);
+            
+            let x = 50;
+            let y = 80;
+            
+            // Test Player sprite with banking animation
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillText('Player (banking)', -30, -40);
+            ctx.restore();
+            
+            const playerFrame = Math.floor(Date.now() / 300) % 5;
+            window.spriteManager.drawAnimatedSprite(ctx, 'player.ship', x, y, playerFrame, {
+                scale: 3,
+                centered: true,
+                framesPerRow: 5,
+                frameWidth: 16,
+                frameHeight: 24,
+                flipY: true
+            });
+            
+            // Test enemy sprites with automatic animation
+            x = 200;
+            
+            // Small enemy
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillText('Small Enemy', -30, -40);
+            ctx.restore();
+            
+            window.spriteManager.drawAnimatedSprite(ctx, 'enemies.small', x, y, -1, {
+                scale: 3,
+                centered: true,
+                framesPerRow: 6,
+                frameWidth: 16,
+                frameHeight: 16,
+                animationSpeed: 150,
+                flipY: true
+            });
+            
+            // Medium enemy
+            x = 350;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillText('Medium Enemy', -35, -40);
+            ctx.restore();
+            
+            window.spriteManager.drawAnimatedSprite(ctx, 'enemies.medium', x, y, -1, {
+                scale: 2,
+                centered: true,
+                framesPerRow: 6,
+                frameWidth: 32,
+                frameHeight: 16,
+                animationSpeed: 150,
+                flipY: true
+            });
+            
+            // Big enemy
+            x = 500;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillText('Big Enemy', -25, -40);
+            ctx.restore();
+            
+            window.spriteManager.drawAnimatedSprite(ctx, 'enemies.big', x, y, -1, {
+                scale: 2,
+                centered: true,
+                framesPerRow: 6,
+                frameWidth: 32,
+                frameHeight: 32,
+                animationSpeed: 150,
+                flipY: true
+            });
+            
+            // Power-ups
+            y = 220;
+            x = 50;
+            
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillText('Power-ups:', -30, -40);
+            ctx.restore();
+            
+            const powerupTypes = ['Weapon', 'Shield', 'Speed', 'Life/Bomb'];
+            for (let i = 0; i < 4; i++) {
+                const px = x + i * 100;
+                
+                ctx.save();
+                ctx.translate(px, y + 40);
+                ctx.fillText(powerupTypes[i], -25, 30);
+                ctx.restore();
+                
+                window.spriteManager.drawAnimatedSprite(ctx, 'powerups.powerup', px, y, i, {
+                    scale: 3,
+                    centered: true,
+                    framesPerRow: 4,
+                    frameWidth: 16,
+                    frameHeight: 16,
+                    flipY: true
+                });
+            }
+            
+            // Explosion animation
+            y = 320;
+            x = 50;
+            
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillText('Explosion:', -30, -40);
+            ctx.restore();
+            
+            window.spriteManager.drawAnimatedSprite(ctx, 'effects.explosion', x, y, -1, {
+                scale: 2,
+                centered: true,
+                framesPerRow: 8,
+                frameWidth: 16,
+                frameHeight: 16,
+                animationSpeed: 100,
+                flipY: true
+            });
+            
+            // Continue animation
+            requestAnimationFrame(animate);
+        }
+        
+        // Run test
+        testSprites();
+    </script>
+</body>
+</html> 

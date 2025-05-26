@@ -160,7 +160,9 @@ class SpriteManager {
             frameY = 0,
             frameWidth = sprite.width,
             frameHeight = sprite.height,
-            centered = true
+            centered = true,
+            flipY = false,
+            flipX = false
         } = options;
 
         ctx.save();
@@ -172,8 +174,12 @@ class SpriteManager {
             ctx.translate(x + frameWidth * scale / 2, y + frameHeight * scale / 2);
         }
         
+        // Apply flipping
+        const scaleX = flipX ? -scale : scale;
+        const scaleY = flipY ? -scale : scale;
+        
         ctx.rotate(rotation);
-        ctx.scale(scale, scale);
+        ctx.scale(scaleX, scaleY);
         
         ctx.drawImage(
             sprite,
@@ -193,22 +199,33 @@ class SpriteManager {
             framesPerRow = 8, 
             frameSize = 64,
             frameWidth,
-            frameHeight
+            frameHeight,
+            animationSpeed = 200, // milliseconds per frame
+            flipY = false,
+            flipX = false
         } = options;
         
         // Use frameWidth/frameHeight if provided, otherwise fall back to frameSize
         const width = frameWidth || frameSize;
         const height = frameHeight || frameSize;
         
-        const frameX = (frame % framesPerRow) * width;
-        const frameY = Math.floor(frame / framesPerRow) * height;
+        // Calculate animated frame based on time if frame is -1
+        let actualFrame = frame;
+        if (frame === -1) {
+            actualFrame = Math.floor(Date.now() / animationSpeed) % framesPerRow;
+        }
+        
+        const frameX = (actualFrame % framesPerRow) * width;
+        const frameY = Math.floor(actualFrame / framesPerRow) * height;
 
         this.drawSprite(ctx, spriteName, x, y, {
             ...options,
             frameX,
             frameY,
             frameWidth: width,
-            frameHeight: height
+            frameHeight: height,
+            flipY,
+            flipX
         });
     }
 }
