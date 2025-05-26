@@ -198,38 +198,43 @@ class PowerUp extends GameObject {
         
         // Draw power-up sprite if available
         if (window.spriteManager && window.spriteManager.loaded) {
-            // The powerup sprite sheet has 4 frames, each 16x16 pixels
-            const frameWidth = 16;
-            const frameHeight = 16;
+            // The powerup sprite is a single 32x32 image, not a sprite sheet
+            // Draw the base powerup sprite
+            window.spriteManager.drawSprite(ctx, 'powerups.powerup', 0, 0, {
+                scale: 1.5,
+                alpha: this.alpha * 0.8,
+                centered: true,
+                flipY: false
+            });
             
-            // Choose frame based on powerup type
-            let frame = 0;
+            // Draw type-specific icon on top
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
             switch(this.type) {
                 case POWERUPS.TYPES.WEAPON_UPGRADE:
-                    frame = 0;
+                    ctx.fillStyle = '#ffff00';
+                    ctx.fillText('W', 0, 0);
                     break;
                 case POWERUPS.TYPES.SHIELD:
-                    frame = 1;
+                    ctx.fillStyle = '#00ffff';
+                    ctx.fillText('S', 0, 0);
                     break;
                 case POWERUPS.TYPES.SPEED_BOOST:
-                    frame = 2;
+                    ctx.fillStyle = '#ff00ff';
+                    ctx.fillText('»', 0, 0);
                     break;
                 case POWERUPS.TYPES.EXTRA_LIFE:
+                    ctx.fillStyle = '#00ff00';
+                    ctx.fillText('1UP', 0, 0);
+                    break;
                 case POWERUPS.TYPES.BOMB:
-                    frame = 3;
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillText('B', 0, 0);
                     break;
             }
-            
-            // Use animated sprite method for sprite sheet
-            window.spriteManager.drawAnimatedSprite(ctx, 'powerups.powerup', 0, 0, frame, {
-                scale: 2,
-                alpha: this.alpha,
-                centered: true,
-                framesPerRow: 4,
-                frameWidth: frameWidth,
-                frameHeight: frameHeight,
-                flipY: true // Flip vertically to correct orientation
-            });
             
             // Add glow effect
             const glowSize = this.width + Math.sin(time * 3) * 5;

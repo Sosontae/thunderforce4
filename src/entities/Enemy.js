@@ -96,6 +96,28 @@ class Enemy extends GameObject {
                 case 'boss':
                     this.shootBossPattern(player);
                     break;
+                // New enemy type shooting patterns
+                case 'scout':
+                    // Scouts shoot fast single shots
+                    this.shootInterval = 800;
+                    this.shootStraight();
+                    break;
+                case 'fighter':
+                    // Fighters shoot double shots
+                    this.shootDouble();
+                    break;
+                case 'bomber':
+                    // Bombers drop bombs downward
+                    this.shootBomb();
+                    break;
+                case 'interceptor':
+                    // Interceptors shoot homing missiles
+                    this.shootHoming(player);
+                    break;
+                case 'elite':
+                    // Elite enemies shoot in a fan pattern
+                    this.shootFan();
+                    break;
             }
             
             // Randomize next shot interval
@@ -212,6 +234,75 @@ class Enemy extends GameObject {
         }
     }
 
+    shootDouble() {
+        // Shoot two parallel bullets
+        const bullet1 = new Bullet(
+            this.x,
+            this.y + this.height / 2 - 5,
+            -BULLETS.ENEMY.SPEED,
+            0,
+            'enemy'
+        );
+        const bullet2 = new Bullet(
+            this.x,
+            this.y + this.height / 2 + 5,
+            -BULLETS.ENEMY.SPEED,
+            0,
+            'enemy'
+        );
+        this.bullets.push(bullet1, bullet2);
+    }
+
+    shootBomb() {
+        // Drop a slow-moving bomb downward
+        const bomb = new Bullet(
+            this.x,
+            this.y + this.height,
+            -BULLETS.ENEMY.SPEED * 0.3,
+            BULLETS.ENEMY.SPEED * 0.5,
+            'enemy'
+        );
+        bomb.damage = 2; // Bombs do more damage
+        bomb.width = 12;
+        bomb.height = 12;
+        this.bullets.push(bomb);
+    }
+
+    shootHoming(player) {
+        if (!player) return;
+        
+        const bullet = new Bullet(
+            this.x,
+            this.y + this.height / 2,
+            -BULLETS.ENEMY.SPEED,
+            0,
+            'enemy'
+        );
+        bullet.homing = true;
+        bullet.target = player;
+        bullet.turnSpeed = 0.05;
+        this.bullets.push(bullet);
+    }
+
+    shootFan() {
+        // Shoot 5 bullets in a fan pattern
+        const bulletCount = 5;
+        const spreadAngle = 20;
+        const baseAngle = 180;
+        
+        for (let i = 0; i < bulletCount; i++) {
+            const angle = degToRad(baseAngle - spreadAngle * 2 + (i * spreadAngle));
+            const bullet = new Bullet(
+                this.x,
+                this.y + this.height / 2,
+                Math.cos(angle) * BULLETS.ENEMY.SPEED * 0.8,
+                Math.sin(angle) * BULLETS.ENEMY.SPEED * 0.8,
+                'enemy'
+            );
+            this.bullets.push(bullet);
+        }
+    }
+
     updateBossBehavior(deltaTime, player) {
         // Boss movement pattern
         if (!this.targetX || !this.targetY) {
@@ -304,66 +395,157 @@ class Enemy extends GameObject {
         // Draw enemy sprite if available
         if (window.spriteManager && window.spriteManager.loaded) {
             let spriteName;
-            let frameWidth, frameHeight, framesPerRow = 1, scale = 1;
+            let frameWidth, frameHeight, totalFrames = 1, scale = 1;
+            let animationSpeed = 300; // Slower animation to prevent blinking
             
             // Choose sprite and dimensions based on enemy type
             switch(this.type) {
                 case ENEMY_TYPES.BOSS:
                     spriteName = 'enemies.biomech';
-                    scale = 1;
-                    break;
+                    scale = 0.8;
+                    
+                    // Draw boss with animated effects
+                    const time = Date.now() * 0.001;
+                    
+                    // Pulsing scale effect
+                    const pulseScale = scale + Math.sin(time * 2) * 0.05;
+                    
+                    // Draw main body
+                    window.spriteManager.drawSprite(ctx, spriteName, 0, 0, {
+                        scale: pulseScale,
+                        alpha: this.alpha,
+                        centered: true,
+                        flipY: false
+                    });
+                    
+                    // Add rotating shield effect
+                    ctx.save();
+                    ctx.rotate(time);
+                    ctx.strokeStyle = fadeColor('#ff0000', 0.3 + Math.sin(time * 3) * 0.2);
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([10, 5]);
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.width * 0.6, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                    
+                    // Add energy core effect
+                    const coreGlow = 10 + Math.sin(time * 4) * 5;
+                    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, coreGlow);
+                    gradient.addColorStop(0, fadeColor('#ff0000', 0.8));
+                    gradient.addColorStop(0.5, fadeColor('#ff6600', 0.4));
+                    gradient.addColorStop(1, 'transparent');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(-coreGlow, -coreGlow, coreGlow * 2, coreGlow * 2);
+                    
+                    // Add glow effect for bosses
+                    ctx.shadowColor = '#ff0000';
+                    ctx.shadowBlur = 20 + Math.sin(time * 2) * 10;
+                    
+                    return; // Exit early for boss
+                    
                 case ENEMY_TYPES.HEAVY:
                     spriteName = 'enemies.big';
                     frameWidth = 32;
                     frameHeight = 32;
-                    framesPerRow = 6;
+                    totalFrames = 2; // 64x32 = 2 frames
                     scale = 2;
                     break;
+                    
                 case ENEMY_TYPES.MEDIUM:
                     spriteName = 'enemies.medium';
                     frameWidth = 32;
                     frameHeight = 16;
-                    framesPerRow = 6;
+                    totalFrames = 2; // 64x16 = 2 frames
                     scale = 1.5;
                     break;
+                    
                 case ENEMY_TYPES.BASIC:
+                    spriteName = 'enemies.small';
+                    frameWidth = 16;
+                    frameHeight = 16;
+                    totalFrames = 2; // 32x16 = 2 frames
+                    scale = 2;
+                    break;
+                    
+                // New enemy types
+                case ENEMY_TYPES.SCOUT:
+                    spriteName = 'enemies.small';
+                    frameWidth = 16;
+                    frameHeight = 16;
+                    totalFrames = 2;
+                    scale = 1.5;
+                    animationSpeed = 150; // Faster animation for scouts
+                    break;
+                    
+                case ENEMY_TYPES.FIGHTER:
+                    spriteName = 'enemies.medium';
+                    frameWidth = 32;
+                    frameHeight = 16;
+                    totalFrames = 2;
+                    scale = 1.3;
+                    break;
+                    
+                case ENEMY_TYPES.BOMBER:
+                    spriteName = 'enemies.big';
+                    frameWidth = 32;
+                    frameHeight = 32;
+                    totalFrames = 2;
+                    scale = 1.7;
+                    animationSpeed = 400; // Slower animation for bombers
+                    break;
+                    
+                case ENEMY_TYPES.INTERCEPTOR:
+                    spriteName = 'enemies.saucer';
+                    scale = 1.2;
+                    // Use regular sprite draw for non-animated sprites
+                    window.spriteManager.drawSprite(ctx, spriteName, 0, 0, {
+                        scale: scale,
+                        alpha: this.alpha,
+                        centered: true,
+                        flipY: false,
+                        rotation: Date.now() * 0.001 // Rotating saucer
+                    });
+                    return; // Exit early
+                    
+                case ENEMY_TYPES.ELITE:
+                    spriteName = 'enemies.void';
+                    scale = 0.4;
+                    // Use regular sprite draw for non-animated sprites
+                    window.spriteManager.drawSprite(ctx, spriteName, 0, 0, {
+                        scale: scale,
+                        alpha: this.alpha,
+                        centered: true,
+                        flipY: false
+                    });
+                    
+                    // Add elite glow effect
+                    ctx.shadowColor = '#ffcc00';
+                    ctx.shadowBlur = 10;
+                    return; // Exit early
+                    
                 default:
                     spriteName = 'enemies.small';
                     frameWidth = 16;
                     frameHeight = 16;
-                    framesPerRow = 6;
+                    totalFrames = 2;
                     scale = 2;
                     break;
             }
             
-            // Draw the sprite
-            if (frameWidth && frameHeight) {
-                // Use animated sprite for sprite sheets with automatic animation
-                window.spriteManager.drawAnimatedSprite(ctx, spriteName, 0, 0, -1, {
-                    scale: scale,
-                    alpha: this.alpha,
-                    centered: true,
-                    framesPerRow: framesPerRow,
-                    frameWidth: frameWidth,
-                    frameHeight: frameHeight,
-                    animationSpeed: 150, // 150ms per frame
-                    flipY: true // Flip vertically to correct orientation
-                });
-            } else {
-                // Use regular sprite for single images
-                window.spriteManager.drawSprite(ctx, spriteName, 0, 0, {
-                    scale: scale,
-                    alpha: this.alpha,
-                    centered: true,
-                    flipY: true // Flip vertically to correct orientation
-                });
-            }
+            // Calculate current frame based on time
+            const frame = Math.floor(Date.now() / animationSpeed) % totalFrames;
             
-            // Add glow effect for bosses
-            if (this.type === ENEMY_TYPES.BOSS) {
-                ctx.shadowColor = '#ff0000';
-                ctx.shadowBlur = 20;
-            }
+            // Draw the sprite
+            window.spriteManager.drawAnimatedSprite(ctx, spriteName, 0, 0, frame, {
+                scale: scale,
+                alpha: this.alpha,
+                centered: true,
+                framesPerRow: totalFrames,
+                frameWidth: frameWidth,
+                frameHeight: frameHeight,
+                flipY: false // Don't flip vertically
+            });
         } else {
             // Fallback to programmatic drawing if sprites not loaded
             ctx.fillStyle = this.color;

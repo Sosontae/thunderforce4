@@ -77,6 +77,47 @@ const ENEMIES = {
         HEALTH: 50,
         SCORE: 5000,
         COLOR: '#9900ff'
+    },
+    // New enemy configurations
+    SCOUT: {
+        WIDTH: 24,
+        HEIGHT: 24,
+        SPEED: 4,
+        HEALTH: 1,
+        SCORE: 150,
+        COLOR: '#00ff99'
+    },
+    FIGHTER: {
+        WIDTH: 40,
+        HEIGHT: 40,
+        SPEED: 2.5,
+        HEALTH: 2,
+        SCORE: 250,
+        COLOR: '#ff9900'
+    },
+    BOMBER: {
+        WIDTH: 56,
+        HEIGHT: 48,
+        SPEED: 1.2,
+        HEALTH: 4,
+        SCORE: 400,
+        COLOR: '#cc00ff'
+    },
+    INTERCEPTOR: {
+        WIDTH: 36,
+        HEIGHT: 36,
+        SPEED: 3.5,
+        HEALTH: 2,
+        SCORE: 350,
+        COLOR: '#00ccff'
+    },
+    ELITE: {
+        WIDTH: 52,
+        HEIGHT: 52,
+        SPEED: 2,
+        HEALTH: 6,
+        SCORE: 600,
+        COLOR: '#ffcc00'
     }
 };
 
@@ -84,7 +125,17 @@ const ENEMY_TYPES = {
     BASIC: 'basic',
     MEDIUM: 'medium', 
     HEAVY: 'heavy',
-    BOSS: 'boss'
+    BOSS: 'boss',
+    // New enemy types
+    SCOUT: 'scout',
+    FIGHTER: 'fighter',
+    BOMBER: 'bomber',
+    INTERCEPTOR: 'interceptor',
+    ELITE: 'elite',
+    // Boss variants
+    BOSS_BIOMECH: 'boss_biomech',
+    BOSS_FORTRESS: 'boss_fortress',
+    BOSS_SWARM: 'boss_swarm'
 };
 
 const POWERUPS = {

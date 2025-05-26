@@ -34,7 +34,10 @@ class SpriteManager {
                 void: 'assets/sprites/enemies/heavy/ships_void.png',
                 
                 // Bosses
-                biomech: 'assets/sprites/enemies/bosses/ships_biomech.png'
+                biomech: 'assets/sprites/enemies/bosses/ships_biomech.png',
+                
+                // Additional enemy types from other sprites
+                arcade: 'assets/sprites/arcade_space_shooter.png'
             },
             
             // Weapons and projectiles

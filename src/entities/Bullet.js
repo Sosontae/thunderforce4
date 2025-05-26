@@ -19,8 +19,10 @@ class Bullet extends GameObject {
         this.waveOffset = 0;
         this.initialY = y;
         
-        this.homingTarget = null;
-        this.homingStrength = 0.05;
+        // Homing properties
+        this.homing = false;
+        this.target = null;
+        this.turnSpeed = 0.05;
         
         this.piercing = level >= 4;
         this.trail = [];
@@ -48,13 +50,13 @@ class Bullet extends GameObject {
         }
 
         // Homing behavior
-        if (this.homingTarget && this.homingTarget.active) {
-            const angle = this.angleTo(this.homingTarget);
+        if (this.homing && this.target && this.target.active) {
+            const angle = this.angleTo(this.target);
             const targetVx = Math.cos(angle) * Math.abs(this.vx);
             const targetVy = Math.sin(angle) * Math.abs(this.vx);
             
-            this.vx = lerp(this.vx, targetVx, this.homingStrength);
-            this.vy = lerp(this.vy, targetVy, this.homingStrength);
+            this.vx = lerp(this.vx, targetVx, this.turnSpeed);
+            this.vy = lerp(this.vy, targetVy, this.turnSpeed);
         }
 
         // Update position

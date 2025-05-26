@@ -327,15 +327,26 @@ class GameScene extends Scene {
     }
     
     spawnRandomEnemies() {
-        // Random enemy configurations
+        // Random enemy configurations including new enemy types
         const configs = [
             { count: 3, type: 'basic', pattern: 'straight' },
             { count: 2, type: 'basic', pattern: 'sine' },
             { count: 4, type: 'basic', pattern: 'circle' },
             { count: 1, type: 'medium', pattern: 'straight' },
             { count: 2, type: 'medium', pattern: 'zigzag' },
-            { count: 5, type: 'basic', pattern: 'wave' }
+            { count: 5, type: 'basic', pattern: 'wave' },
+            // New enemy type waves
+            { count: 4, type: 'scout', pattern: 'sine' },
+            { count: 2, type: 'fighter', pattern: 'straight' },
+            { count: 1, type: 'bomber', pattern: 'straight' },
+            { count: 3, type: 'interceptor', pattern: 'circle' },
+            { count: 1, type: 'elite', pattern: 'zigzag' },
+            { count: 2, type: 'scout', pattern: 'wave' },
+            { count: 3, type: 'fighter', pattern: 'sine' }
         ];
+        
+        // Increase difficulty based on level
+        const levelMultiplier = 1 + (this.currentLevel - 1) * 0.3;
         
         // Pick a random configuration
         const config = configs[Math.floor(Math.random() * configs.length)];
@@ -346,6 +357,10 @@ class GameScene extends Scene {
                 const y = randomRange(50, GAME_HEIGHT - 50);
                 const enemy = new Enemy(GAME_WIDTH + 50 + i * 30, y, config.type);
                 enemy.setMovementPattern(config.pattern);
+                
+                // Scale difficulty
+                enemy.health = Math.ceil(enemy.health * levelMultiplier);
+                enemy.speed = enemy.speed * (1 + (this.currentLevel - 1) * 0.1);
                 
                 this.enemies.push(enemy);
                 this.addGameObject(enemy);
@@ -643,21 +658,48 @@ class GameScene extends Scene {
     }
 
     gameOver() {
-        // Show game over screen
-        document.getElementById('game-over-screen').classList.add('active');
-        document.getElementById('finalScore').textContent = formatScore(this.player.score);
+        // Store current level
+        const currentLevelToRestart = this.currentLevel;
         
-        // Play game over sound
+        // Show death message
+        this.createFloatingText(
+            GAME_WIDTH / 2,
+            GAME_HEIGHT / 2,
+            'LEVEL FAILED - RESTARTING...',
+            '#ff0000',
+            2000
+        );
+        
+        // Play death sound
         if (window.soundManager) {
-            window.soundManager.stopMusic();
             window.soundManager.play('gameOver');
         }
         
-        // Set up restart handler
-        const restartButton = document.getElementById('restartButton');
-        restartButton.onclick = () => {
-            this.game.changeScene('game', { restart: true });
-        };
+        // Restart level after delay
+        setTimeout(() => {
+            // Clear all entities
+            this.enemies = [];
+            this.playerBullets = [];
+            this.enemyBullets = [];
+            this.powerUps = [];
+            this.explosions = [];
+            this.gameObjects = [];
+            
+            // Reset game state but keep current level
+            this.gameTime = 0;
+            this.levelTime = 0;
+            this.enemySpawnTimer = 0;
+            this.bossSpawned = false;
+            this.comboCount = 0;
+            this.scoreMultiplier = 1;
+            this.lastRandomSpawnTime = 0;
+            
+            // Recreate player with full lives
+            this.createPlayer();
+            
+            // Start the same level again
+            this.startLevel(currentLevelToRestart);
+        }, 2000);
     }
 
     resetGame() {

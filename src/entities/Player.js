@@ -346,35 +346,43 @@ class Player extends GameObject {
 
         // Draw player sprite if available
         if (window.spriteManager && window.spriteManager.loaded) {
-            // The ship sprite sheet has 5 frames, each 16x24 pixels
+            // The ship sprite sheet is 80x48 with 5 frames (each 16x48 pixels)
             const frameWidth = 16;
-            const frameHeight = 24;
+            const frameHeight = 48;
             
             // Use animated frame based on movement
             let frame = 2; // Default middle frame
-            if (this.vy < 0) frame = 0; // Moving up
-            else if (this.vy > 0) frame = 4; // Moving down
-            else if (this.vx !== 0) frame = 1 + Math.floor(Date.now() / 200) % 2; // Moving horizontally, animate between frames 1 and 2
+            if (this.vy < -1) {
+                frame = 3; // Banking up
+            } else if (this.vy < 0) {
+                frame = 1; // Slight bank up
+            } else if (this.vy > 1) {
+                frame = 4; // Banking down
+            } else if (this.vy > 0) {
+                frame = 0; // Slight bank down
+            } else {
+                frame = 2; // Center when not moving vertically
+            }
             
             // Use animated sprite method for sprite sheet
             window.spriteManager.drawAnimatedSprite(ctx, 'player.ship', 0, 0, frame, {
-                scale: 2, // Scale up 2x for visibility
+                scale: 1.5, // Scale for visibility
                 alpha: this.alpha,
                 centered: true,
                 framesPerRow: 5,
                 frameWidth: frameWidth,
                 frameHeight: frameHeight,
-                flipY: true // Flip vertically to correct orientation
+                flipY: false // Don't flip the player sprite
             });
             
             // Draw engine glow effect
             if (this.engineGlow > 0) {
                 const gradient = ctx.createRadialGradient(
-                    -this.width / 2, 0, 0,
-                    -this.width / 2, 0, this.height * this.engineGlow
+                    -this.width / 2 - 5, 0, 0,
+                    -this.width / 2 - 5, 0, this.height * this.engineGlow * 0.5
                 );
                 gradient.addColorStop(0, fadeColor('#ff6600', this.engineGlow));
-                gradient.addColorStop(0.5, fadeColor('#ff9900', this.engineGlow * 0.8));
+                gradient.addColorStop(0.5, fadeColor('#ff9900', this.engineGlow * 0.5));
                 gradient.addColorStop(1, 'transparent');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(
