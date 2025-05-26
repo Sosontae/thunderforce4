@@ -38,22 +38,22 @@ download_music() {
     # Archive.org allows direct downloads
     BASE_URL="https://archive.org/download/md_music_thunder_force_iv"
     
-    # Download key music tracks
+    # Download key music tracks - using correct archive.org format
     declare -a tracks=(
-        "01_lightning_strikes_again.ogg:lightning_strikes_again.ogg"
-        "02_tan_tan_ta_ta_ta_tan.ogg:tan_tan_ta_ta_ta_tan.ogg"
-        "03_dont_go_off.ogg:dont_go_off.ogg"
-        "04_fighting_back.ogg:fighting_back.ogg"
-        "06_evil_destroyer.ogg:evil_destroyer.ogg"
-        "07_space_walk.ogg:space_walk.ogg"
-        "09_attack_sharply.ogg:attack_sharply.ogg"
-        "10_the_sky_line.ogg:the_sky_line.ogg"
-        "13_sand_hell.ogg:sand_hell.ogg"
-        "17_battle_ship.ogg:battle_ship.ogg"
-        "25_metal_squad.ogg:metal_squad.ogg"
-        "31_war_like_requiem.ogg:war_like_requiem.ogg"
-        "36_stand_up_against_myself.ogg:stand_up_against_myself.ogg"
-        "37_dead_end.ogg:dead_end.ogg"
+        "01%20-%20Lightning%20Strikes%20Again%20%28Opening%20Theme%29.ogg:lightning_strikes_again.ogg"
+        "02%20-%20Tan%20Tan%20Ta%20Ta%20Ta%20Tan%20%28Configuration%29.ogg:tan_tan_ta_ta_ta_tan.ogg"
+        "03%20-%20Don%27t%20Go%20Off%20%28Course%20Select%29.ogg:dont_go_off.ogg"
+        "04%20-%20Fighting%20Back%20%28Stage%201A%29.ogg:fighting_back.ogg"
+        "06%20-%20Evil%20Destroyer%20%28Stage%201%20Boss%29.ogg:evil_destroyer.ogg"
+        "07%20-%20Space%20Walk%20%28Stage%202A%29.ogg:space_walk.ogg"
+        "09%20-%20Attack%20Sharply%20%28Stage%202%20Boss%29.ogg:attack_sharply.ogg"
+        "10%20-%20The%20Sky%20Line%20%28Stage%203A%29.ogg:the_sky_line.ogg"
+        "13%20-%20Sand%20Hell%20%28Stage%204A%29.ogg:sand_hell.ogg"
+        "17%20-%20Battle%20Ship%20%28Stage%205%29.ogg:battle_ship.ogg"
+        "25%20-%20Metal%20Squad%20%28Stage%208%29.ogg:metal_squad.ogg"
+        "31%20-%20War%20Like%20Requiem%20%28Stage%2010%20Boss%29.ogg:war_like_requiem.ogg"
+        "36%20-%20Stand%20Up%20Against%20Myself%20%28Staff%20Roll%29.ogg:stand_up_against_myself.ogg"
+        "37%20-%20Dead%20End%20%28Game%20Over%29.ogg:dead_end.ogg"
     )
     
     for track in "${tracks[@]}"; do

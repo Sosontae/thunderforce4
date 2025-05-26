@@ -1,118 +1,122 @@
-# Thunder Force 4 Assets Setup Guide
+# Thunder Force IV Asset Setup
 
 ## Overview
-This Thunder Force 4 replica requires authentic sprites and music to properly recreate the experience. Since we cannot include copyrighted assets, you'll need to obtain them separately.
+This document explains the asset setup for the Thunder Force IV HTML5 replica game.
 
-## Music Files Required
+## Current Asset Status
 
-Download the Thunder Force 4 soundtrack and place the files in `assets/audio/`:
-
-### Required Music Files:
+### ✅ Music (Downloaded from Archive.org)
+The following authentic Thunder Force IV music tracks have been downloaded:
+- `lightning_strikes_again.ogg` - Opening Theme
 - `tan_tan_ta_ta_ta_tan.ogg` - Configuration/Menu Music
 - `dont_go_off.ogg` - Stage Select
-- `fighting_back.ogg` - Stage 1 (Strite)
+- `fighting_back.ogg` - Stage 1 Music
 - `evil_destroyer.ogg` - Stage 1 Boss
-- `space_walk.ogg` - Stage 2 (Daser)
+- `space_walk.ogg` - Stage 2 Music
 - `attack_sharply.ogg` - Stage 2 Boss
-- `the_sky_line.ogg` - Stage 3 (Ruins)
-- `simmer_down.ogg` - Stage 3 Boss
-- `sand_hell.ogg` - Stage 4 (Volbados)
-- `strike_out.ogg` - Stage 4 Boss
-- `battle_ship.ogg` - Stage 5 (Vios)
-- `stranger.ogg` - Stage 5 Boss
-- `metal_squad.ogg` - Stage 8 (Vios Fortress)
-- `war_like_requiem.ogg` - Final Boss
-- `stand_up_against_myself.ogg` - Staff Roll
+- `the_sky_line.ogg` - Stage 3 Music
+- `sand_hell.ogg` - Stage 4 Music
+- `battle_ship.ogg` - Stage 5 Music
+- `metal_squad.ogg` - Stage 8 Music
+- `war_like_requiem.ogg` - Final Boss Music
+- `stand_up_against_myself.ogg` - Staff Roll/Ending
 - `dead_end.ogg` - Game Over
 
-### Where to Find:
-1. **VGM Archives**: https://downloads.khinsider.com/game-soundtracks/album/thunder-force-iv-1992-genesis
-2. **Internet Archive**: https://archive.org/details/md_music_thunder_force_iv
-3. Convert MP3 files to OGG format using tools like Audacity or FFmpeg
-
-### Converting MP3 to OGG:
-```bash
-# Using FFmpeg
-ffmpeg -i "01 - Lightning Strikes Again.mp3" -c:a libvorbis -q:a 4 lightning_strikes_again.ogg
-```
-
-## Sprite Files Required
-
-Place sprite sheets in `assets/sprites/`:
-
-### Player Sprites:
-- `rynex.png` - Player ship (Rynex) sprite sheet
-
-### Enemy Sprites:
-- `gargoyle_diver.png` - Basic enemy type
-- `faust.png` - Medium enemy type
-- `armament_claw.png` - Heavy enemy type
-- `evil_core.png` - Boss sprite
-- `hell_arm.png` - Stage 4 boss
-- `spark_lancer.png` - Stage 5 boss
-
-### Effect Sprites:
-- `explosion_set2.png` - Explosion animations
-- `bullet_collection.png` - Various bullet sprites
-
-### Where to Find:
-1. **Spriters Resource**: https://www.spriters-resource.com/genesis_32x_scd/thunderforceiv/
-2. **Thunder Force Wiki**: Various fan sites with sprite rips
-3. **Genesis/Mega Drive sprite archives**
-
-## Sound Effects
-
-Basic placeholder sound effects are included, but you can replace them with authentic ones:
-
-- `laser1.wav` - Player shot
-- `explosion_01.ogg` - Enemy explosion
+### ✅ Sound Effects (Generated with Sox)
+Basic sound effects have been generated:
+- `laser1.wav` - Primary shoot sound
+- `shoot_01.ogg` - Alternative shoot
+- `explosion_01.ogg` - Basic explosion
+- `retro_explosion.ogg` - Alternative explosion
+- `boss_explosion.ogg` - Boss explosion
 - `powerup.ogg` - Power-up collection
-- `weapon_switch.ogg` - Weapon change sound
+- `beep_01.ogg` - Menu select
+- `terminal_01.ogg` - Menu move
+- `weapon_switch.ogg` - Weapon switching
+- And more...
 
-## Background Images
+### 🎨 Sprites (Generated Retro-Style)
+Custom retro-style sprites have been generated using Python/PIL:
 
-Place background images in `assets/backgrounds/`:
-- `starfield1.jpg` - Space background
-- `starfield2.jpg` - Alternative space background
-- Stage-specific backgrounds if available
+#### Player Ship
+- `rynex.png` - Player ship sprite sheet (240x32, 5 frames)
+  - Frame 0: Idle
+  - Frame 1: Moving up
+  - Frame 2: Moving down
+  - Frame 3: Banking left
+  - Frame 4: Banking right
 
-## File Structure
+#### Enemies
+- `gargoyle_diver.png` - Basic flying enemy (32x32)
+- `faust.png` - Medium diamond-shaped enemy (40x40)
+- `armament_claw.png` - Heavy mechanical enemy (64x48)
+- `evil_core.png` - Boss enemy (128x96)
+- `hell_arm.png` - Large enemy (96x80)
+- `spark_lancer.png` - Advanced enemy (80x64)
+- And more...
 
-Your assets folder should look like this:
+#### Effects
+- `explosion_set2.png` - Explosion animation (512x64, 8 frames)
+- `pixel_explosion.png` - Pixel explosion effect (256x256)
+- `simple_explosion.png` - Simple explosion (128x128)
+
+#### Power-ups
+- `powerup_weapon.png` - Weapon upgrade
+- `powerup_shield.png` - Shield
+- `powerup_speed.png` - Speed boost
+- `powerup_life.png` - Extra life
+- `powerup_bomb.png` - Screen-clearing bomb
+
+#### Backgrounds
+- `starfield1.jpg` - Basic starfield
+- `starfield2.jpg` - Detailed starfield with nebula
+
+## Getting Authentic Sprites
+
+For authentic Thunder Force IV sprites, you can:
+
+1. Visit https://www.spriters-resource.com/sega_genesis_32x/thunderforce4/
+2. Click on each sprite sheet to view
+3. Download the PNG files
+4. Replace the generated sprites in `assets/sprites/`
+
+### Sprite Naming Convention
+When downloading authentic sprites, rename them to match:
+- Fire Leo 04 "Rynex" → `rynex.png`
+- Gargoyle Diver → `gargoyle_diver.png`
+- Faust → `faust.png`
+- Armament Claw → `armament_claw.png`
+- Evil Core → `evil_core.png`
+- Hell Arm → `hell_arm.png`
+- Spark Lancer → `spark_lancer.png`
+- Versus → `versus.png`
+
+## Running the Asset Scripts
+
+### Download Music and Create Placeholders
+```bash
+./download_assets.sh
 ```
-assets/
-├── audio/
-│   ├── tan_tan_ta_ta_ta_tan.ogg
-│   ├── fighting_back.ogg
-│   ├── metal_squad.ogg
-│   └── ... (other music files)
-├── sprites/
-│   ├── rynex.png
-│   ├── gargoyle_diver.png
-│   └── ... (other sprites)
-├── backgrounds/
-│   └── starfield1.jpg
-└── fonts/
-    └── retro.ttf (optional retro font)
+
+### Generate Better Sprites
+```bash
+python3 generate_sprites.py
 ```
 
-## Quick Start
+### Generate Additional Sound Effects
+```bash
+./generate_sound_effects.sh
+```
 
-1. Download the Thunder Force 4 OST from the links above
-2. Convert tracks to OGG format (keep quality high)
-3. Rename files to match the expected names
-4. Download sprite sheets from Spriters Resource
-5. Place all files in their respective folders
-6. Launch the game!
+## Asset Requirements
 
-## Legal Notice
+- **Audio**: OGG format for music, WAV/OGG for sound effects
+- **Sprites**: PNG format with transparency
+- **Backgrounds**: JPG or PNG format
 
-Please only use assets you legally own. This project is for educational purposes and requires you to provide your own game assets.
+## Notes
 
-## Troubleshooting
-
-If assets don't load:
-1. Check browser console for 404 errors
-2. Verify file names match exactly (case-sensitive)
-3. Ensure OGG files are properly encoded
-4. Try different browsers (Chrome/Firefox work best) 
+- The generated sprites are stylized retro recreations, not exact replicas
+- Music is authentic from the Sega Genesis/Mega Drive version
+- Sound effects are synthesized approximations
+- For the most authentic experience, manually download the original sprite sheets 

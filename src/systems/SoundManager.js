@@ -73,6 +73,12 @@ class SoundManager {
                 return;
             }
             
+            // Skip if it's a placeholder
+            if (!audioElement.duration && !audioElement.cloneNode) {
+                console.log(`Skipping placeholder audio: ${soundName}`);
+                return;
+            }
+            
             if (config.pooled) {
                 this.createSoundPool(soundName, audioElement, config.type);
             } else {

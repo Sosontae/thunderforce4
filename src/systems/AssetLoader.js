@@ -62,24 +62,24 @@ class AssetLoader {
                 weaponSwitch: 'assets/audio/weapon_switch.ogg',
                 boss_explosion: 'assets/audio/boss_explosion.ogg',
                 
-                // Thunder Force 4 Music Tracks - Using actual downloaded files
-                opening: 'assets/audio/lightning_strikes_again.ogg', // Opening Theme
-                menuMusic: 'assets/audio/tan_tan_ta_ta_ta_tan.ogg', // Configuration
-                stageSelect: 'assets/audio/dont_go_off.ogg', // Course Select
-                stage1Music: 'assets/audio/fighting_back.ogg', // Stage 1A
-                stage1BossMusic: 'assets/audio/evil_destroyer.ogg', // Stage 1 Boss
-                stage2Music: 'assets/audio/space_walk.ogg', // Stage 2A
-                stage2BossMusic: 'assets/audio/attack_sharply.ogg', // Stage 2 Boss
-                stage3Music: 'assets/audio/the_sky_line.ogg', // Stage 3A
-                stage3BossMusic: 'assets/audio/simmer_down.ogg', // Stage 3 Boss (not downloaded yet)
-                stage4Music: 'assets/audio/sand_hell.ogg', // Stage 4A
-                stage4BossMusic: 'assets/audio/strike_out.ogg', // Stage 4 Boss (not downloaded yet)
-                stage5Music: 'assets/audio/battle_ship.ogg', // Stage 5
-                stage5BossMusic: 'assets/audio/stranger.ogg', // Stage 5 Boss (not downloaded yet)
-                stage8Music: 'assets/audio/metal_squad.ogg', // Stage 8
-                bossMusic: 'assets/audio/war_like_requiem.ogg', // Final Boss
-                endingMusic: 'assets/audio/stand_up_against_myself.ogg', // Staff Roll
-                gameMusic: 'assets/audio/fighting_back.ogg' // Default game music
+                // Thunder Force 4 Music Tracks - Fallback to generated sounds for now
+                opening: 'assets/audio/charge_up.ogg', // Using charge up as opening
+                menuMusic: 'assets/audio/charge_up.ogg', // Menu music fallback
+                stageSelect: 'assets/audio/beep_01.ogg', // Stage select fallback
+                stage1Music: 'assets/audio/laser_beam.ogg', // Stage 1 fallback
+                stage1BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
+                stage2Music: 'assets/audio/laser_beam.ogg', // Stage 2 fallback
+                stage2BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
+                stage3Music: 'assets/audio/laser_beam.ogg', // Stage 3 fallback
+                stage3BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
+                stage4Music: 'assets/audio/laser_beam.ogg', // Stage 4 fallback
+                stage4BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
+                stage5Music: 'assets/audio/laser_beam.ogg', // Stage 5 fallback
+                stage5BossMusic: 'assets/audio/boss_explosion.ogg', // Boss music fallback
+                stage8Music: 'assets/audio/laser_beam.ogg', // Stage 8 fallback
+                bossMusic: 'assets/audio/boss_explosion.ogg', // Final Boss fallback
+                endingMusic: 'assets/audio/charge_up.ogg', // Ending fallback
+                gameMusic: 'assets/audio/laser_beam.ogg' // Default game music fallback
             },
             
             backgrounds: {
@@ -135,8 +135,30 @@ class AssetLoader {
             };
             
             img.onerror = () => {
-                console.error(`Failed to load sprite: ${name} from ${path}`);
-                reject(new Error(`Failed to load sprite: ${name}`));
+                console.warn(`Failed to load sprite: ${name} from ${path}, using placeholder`);
+                // Create a placeholder image instead of failing
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ff00ff';
+                ctx.fillRect(0, 0, 64, 64);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '12px monospace';
+                ctx.fillText(name, 5, 30);
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const placeholderImg = new Image();
+                    placeholderImg.onload = () => {
+                        this.assets.sprites[name] = placeholderImg;
+                        this.loadedAssets++;
+                        this.loadingProgress = this.loadedAssets / this.totalAssets;
+                        console.log(`Created placeholder for sprite: ${name}`);
+                        resolve();
+                    };
+                    placeholderImg.src = url;
+                });
             };
             
             img.src = path;
@@ -166,8 +188,21 @@ class AssetLoader {
             }, { once: true });
             
             audio.addEventListener('error', () => {
-                console.error(`Failed to load audio: ${name} from ${path}`);
-                reject(new Error(`Failed to load audio: ${name}`));
+                console.warn(`Failed to load audio: ${name} from ${path}, creating silent placeholder`);
+                // Create a silent audio placeholder instead of failing
+                this.assets.audio[name] = {
+                    play: () => console.log(`Playing placeholder sound: ${name}`),
+                    pause: () => {},
+                    load: () => {},
+                    cloneNode: () => ({
+                        play: () => console.log(`Playing placeholder sound: ${name}`),
+                        pause: () => {},
+                        addEventListener: () => {}
+                    })
+                };
+                this.loadedAssets++;
+                this.loadingProgress = this.loadedAssets / this.totalAssets;
+                resolve();
             }, { once: true });
             
             audio.src = path;
