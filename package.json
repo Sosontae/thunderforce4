@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx http-server -p 8080 -c-1",
     "dev": "npx live-server --port=8080",
-    "build": "echo 'No build step required - vanilla JS project'"
+    "build": "mkdir -p public && cp -r index.html style.css src assets public/"
   },
   "keywords": [
     "thunder-force",
