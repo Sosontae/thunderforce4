@@ -34,6 +34,94 @@ const STAGES = {
                 enemies: [
                     { type: 'medium', count: 4, pattern: 'dive', spacing: 300 }
                 ]
+            },
+            {
+                time: 20000,
+                enemies: [
+                    { type: 'basic', count: 8, pattern: 'wave', spacing: 250 }
+                ]
+            },
+            {
+                time: 25000,
+                enemies: [
+                    { type: 'medium', count: 2, pattern: 'spiral', spacing: 500 },
+                    { type: 'basic', count: 5, pattern: 'straight', spacing: 200 }
+                ]
+            },
+            {
+                time: 30000,
+                enemies: [
+                    { type: 'heavy', count: 2, pattern: 'formation', spacing: 600 }
+                ]
+            },
+            {
+                time: 35000,
+                enemies: [
+                    { type: 'basic', count: 10, pattern: 'swarm', spacing: 150 }
+                ]
+            },
+            {
+                time: 40000,
+                enemies: [
+                    { type: 'medium', count: 5, pattern: 'pincer', spacing: 300 }
+                ]
+            },
+            {
+                time: 45000,
+                enemies: [
+                    { type: 'heavy', count: 1, pattern: 'straight', spacing: 0 },
+                    { type: 'basic', count: 8, pattern: 'circle', spacing: 120 }
+                ]
+            },
+            {
+                time: 50000,
+                enemies: [
+                    { type: 'medium', count: 6, pattern: 'crossfire', spacing: 250 }
+                ]
+            },
+            {
+                time: 55000,
+                enemies: [
+                    { type: 'basic', count: 12, pattern: 'wave', spacing: 180 }
+                ]
+            },
+            {
+                time: 60000,
+                enemies: [
+                    { type: 'heavy', count: 3, pattern: 'column', spacing: 400 }
+                ]
+            },
+            {
+                time: 65000,
+                enemies: [
+                    { type: 'medium', count: 4, pattern: 'formation', spacing: 300 },
+                    { type: 'basic', count: 6, pattern: 'sine', spacing: 200 }
+                ]
+            },
+            {
+                time: 70000,
+                enemies: [
+                    { type: 'basic', count: 15, pattern: 'swarm', spacing: 100 }
+                ]
+            },
+            {
+                time: 75000,
+                enemies: [
+                    { type: 'heavy', count: 2, pattern: 'straight', spacing: 500 },
+                    { type: 'medium', count: 3, pattern: 'dive', spacing: 350 }
+                ]
+            },
+            {
+                time: 80000,
+                enemies: [
+                    { type: 'medium', count: 8, pattern: 'spiral', spacing: 200 }
+                ]
+            },
+            {
+                time: 85000,
+                enemies: [
+                    { type: 'basic', count: 20, pattern: 'storm', spacing: 80 }
+                ]
             }
         ]
     },
@@ -272,7 +360,75 @@ const WAVE_PATTERNS = {
             x: startX - time * 0.12 + Math.cos(angle) * time * 0.05,
             y: startY + Math.sin(angle) * time * 0.05
         };
-    }
+    },
+    
+    storm: (startX, startY, index, time) => {
+        const speed = 0.2 + Math.random() * 0.1;
+        const angle = Math.random() * Math.PI * 2;
+        return {
+            x: startX - time * speed + Math.cos(angle + time * 0.001) * 30,
+            y: startY + Math.sin(angle + time * 0.002) * 50 + Math.random() * 40 - 20
+        };
+    },
+    
+    // Additional patterns for variety
+    fast_straight: (startX, startY, index, time) => ({
+        x: startX - time * 0.25,
+        y: startY
+    }),
+    
+    pinwheel: (startX, startY, index, time) => {
+        const radius = 80;
+        const angle = time * 0.003 + index * (Math.PI / 4);
+        return {
+            x: startX - time * 0.08 + Math.cos(angle) * radius,
+            y: startY + Math.sin(angle) * radius
+        };
+    },
+    
+    fortress_defense: (startX, startY, index, time) => ({
+        x: startX - 100 - index * 150,
+        y: startY + Math.sin(time * 0.002) * 20
+    }),
+    
+    all_range: (startX, startY, index, time) => {
+        const sector = index % 4;
+        const offset = Math.floor(index / 4) * 50;
+        switch(sector) {
+            case 0: return { x: startX - time * 0.1, y: offset };
+            case 1: return { x: GAME_WIDTH - offset, y: startY - time * 0.1 };
+            case 2: return { x: startX - time * 0.1, y: GAME_HEIGHT - offset };
+            case 3: return { x: offset, y: startY + time * 0.1 };
+        }
+    },
+    
+    final_assault: (startX, startY, index, time) => ({
+        x: startX - time * 0.3 - Math.random() * 50,
+        y: startY + Math.sin(time * 0.01 + index) * 100
+    }),
+    
+    guardian: (startX, startY, index, time) => ({
+        x: startX - 200 - index * 100,
+        y: startY + Math.sin(time * 0.001 + index) * 50
+    }),
+    
+    scatter: (startX, startY, index, time) => {
+        const angle = (index / 12) * Math.PI * 2;
+        return {
+            x: startX - time * 0.15 + Math.cos(angle) * time * 0.1,
+            y: startY + Math.sin(angle) * time * 0.1
+        };
+    },
+    
+    boss_approach: (startX, startY, index, time) => ({
+        x: Math.max(GAME_WIDTH - 200, startX - time * 0.05),
+        y: startY + Math.sin(time * 0.001) * 30
+    }),
+    
+    escort: (startX, startY, index, time) => ({
+        x: startX - time * 0.05 - 100,
+        y: startY + (index === 0 ? -100 : 100) + Math.sin(time * 0.002) * 20
+    })
 };
 
 // Function to spawn enemy wave

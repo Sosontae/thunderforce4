@@ -46,9 +46,11 @@ class Game {
         
         this.ctx = this.canvas.getContext('2d');
         
-        // Set canvas size
-        this.canvas.width = GAME_WIDTH;
-        this.canvas.height = GAME_HEIGHT;
+        // Set canvas size and scaling
+        this.setupCanvas();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => this.handleResize());
         
         // Initialize systems
         this.initializeSystems();
@@ -60,6 +62,43 @@ class Game {
         this.changeScene('menu');
         
         return true;
+    }
+    
+    setupCanvas() {
+        // Set internal game resolution
+        this.canvas.width = GAME_WIDTH;
+        this.canvas.height = GAME_HEIGHT;
+        
+        // Scale canvas to fit window while maintaining aspect ratio
+        this.scaleCanvas();
+        
+        // Enable image smoothing for better quality
+        this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingQuality = 'high';
+    }
+    
+    scaleCanvas() {
+        const container = document.getElementById('game-container');
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        
+        // Calculate scale to fit window while maintaining aspect ratio
+        const scaleX = windowWidth / GAME_WIDTH;
+        const scaleY = windowHeight / GAME_HEIGHT;
+        const scale = Math.min(scaleX, scaleY);
+        
+        // Apply scale to canvas
+        this.canvas.style.width = `${GAME_WIDTH * scale}px`;
+        this.canvas.style.height = `${GAME_HEIGHT * scale}px`;
+        
+        // Center canvas
+        this.canvas.style.position = 'absolute';
+        this.canvas.style.left = `${(windowWidth - GAME_WIDTH * scale) / 2}px`;
+        this.canvas.style.top = `${(windowHeight - GAME_HEIGHT * scale) / 2}px`;
+    }
+    
+    handleResize() {
+        this.scaleCanvas();
     }
 
     initializeSystems() {

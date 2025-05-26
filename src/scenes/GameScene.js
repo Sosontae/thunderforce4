@@ -29,6 +29,8 @@ class GameScene extends Scene {
         this.currentWave = 0;
         this.waveEnemies = [];
         this.waveTimer = 0;
+        this.lastRandomSpawnTime = 0;
+        this.randomSpawnInterval = 3000; // Spawn random enemies every 3 seconds
         
         // Score multiplier
         this.scoreMultiplier = 1;
@@ -305,10 +307,49 @@ class GameScene extends Scene {
             }
         });
         
+        // Random enemy spawning to fill gaps
+        if (this.levelTime - this.lastRandomSpawnTime > this.randomSpawnInterval && !this.bossSpawned) {
+            // Only spawn if there are less than 10 enemies on screen
+            if (this.enemies.length < 10) {
+                this.spawnRandomEnemies();
+                this.lastRandomSpawnTime = this.levelTime;
+                
+                // Vary the spawn interval
+                this.randomSpawnInterval = randomRange(2000, 4000);
+            }
+        }
+        
         // Check for boss spawn
         const levelConfig = LEVELS[this.currentLevel];
         if (!this.bossSpawned && this.levelTime >= levelConfig.duration * 0.8) {
             this.spawnBoss();
+        }
+    }
+    
+    spawnRandomEnemies() {
+        // Random enemy configurations
+        const configs = [
+            { count: 3, type: 'basic', pattern: 'straight' },
+            { count: 2, type: 'basic', pattern: 'sine' },
+            { count: 4, type: 'basic', pattern: 'circle' },
+            { count: 1, type: 'medium', pattern: 'straight' },
+            { count: 2, type: 'medium', pattern: 'zigzag' },
+            { count: 5, type: 'basic', pattern: 'wave' }
+        ];
+        
+        // Pick a random configuration
+        const config = configs[Math.floor(Math.random() * configs.length)];
+        
+        // Spawn the enemies
+        for (let i = 0; i < config.count; i++) {
+            setTimeout(() => {
+                const y = randomRange(50, GAME_HEIGHT - 50);
+                const enemy = new Enemy(GAME_WIDTH + 50 + i * 30, y, config.type);
+                enemy.setMovementPattern(config.pattern);
+                
+                this.enemies.push(enemy);
+                this.addGameObject(enemy);
+            }, i * 200);
         }
     }
 
@@ -338,6 +379,13 @@ class GameScene extends Scene {
     spawnBoss() {
         this.bossSpawned = true;
         
+        // Clear all existing enemies for dramatic effect
+        this.enemies.forEach(enemy => {
+            if (enemy.active && enemy.type !== 'boss') {
+                enemy.fadeOut(500);
+            }
+        });
+        
         // Warning
         this.createFloatingText(
             GAME_WIDTH / 2,
@@ -346,6 +394,9 @@ class GameScene extends Scene {
             '#ff0000',
             2000
         );
+        
+        // Screen flash effect
+        this.createScreenFlash('#ff0000', 300);
         
         // Play boss warning sound
         if (window.soundManager) {
@@ -360,6 +411,11 @@ class GameScene extends Scene {
                 'boss'
             );
             
+            // Give boss some special properties
+            boss.score = ENEMIES.BOSS.SCORE * this.currentLevel;
+            boss.health = ENEMIES.BOSS.HEALTH * (1 + (this.currentLevel - 1) * 0.5);
+            boss.maxHealth = boss.health;
+            
             this.enemies.push(boss);
             this.addGameObject(boss);
             
@@ -368,6 +424,9 @@ class GameScene extends Scene {
                 // Use the same boss music for all levels
                 window.soundManager.playMusic('bossMusic');
             }
+            
+            // Camera shake for dramatic entrance
+            this.shakeCamera(20, 500);
         }, 2000);
     }
 
@@ -509,6 +568,12 @@ class GameScene extends Scene {
         const speedDisplay = document.getElementById('speedMode');
         if (speedDisplay) {
             speedDisplay.textContent = this.player.speedMode.toUpperCase();
+        }
+        
+        // Update level
+        const levelDisplay = document.getElementById('levelValue');
+        if (levelDisplay) {
+            levelDisplay.textContent = this.currentLevel;
         }
     }
 

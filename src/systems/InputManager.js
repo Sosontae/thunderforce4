@@ -211,8 +211,13 @@ class InputManager {
     updateMousePosition(event) {
         const canvas = document.getElementById('gameCanvas');
         const rect = canvas.getBoundingClientRect();
-        this.mousePosition.x = event.clientX - rect.left;
-        this.mousePosition.y = event.clientY - rect.top;
+        
+        // Scale mouse position to game coordinates
+        const scaleX = GAME_WIDTH / rect.width;
+        const scaleY = GAME_HEIGHT / rect.height;
+        
+        this.mousePosition.x = (event.clientX - rect.left) * scaleX;
+        this.mousePosition.y = (event.clientY - rect.top) * scaleY;
     }
 
     isGameKey(code) {

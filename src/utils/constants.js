@@ -1,7 +1,7 @@
 // Thunder Force IV Constants
 
-const GAME_WIDTH = 800;
-const GAME_HEIGHT = 600;
+const GAME_WIDTH = 1280;
+const GAME_HEIGHT = 720;
 
 const GAME_STATES = {
     MENU: 'menu',

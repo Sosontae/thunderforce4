@@ -35,6 +35,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Hide loading message
             hideLoadingMessage();
+            
+            // Try to enter fullscreen automatically
+            setTimeout(() => {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log('Auto-fullscreen blocked:', err.message);
+                        // Show fullscreen prompt
+                        showFullscreenPrompt(game);
+                    });
+                }
+            }, 100);
         } else {
             console.error('Failed to initialize game!');
             showErrorMessage('Failed to initialize game. Please refresh the page.');
@@ -179,6 +190,57 @@ function showErrorMessage(message) {
     
     const container = document.getElementById('game-container');
     container.appendChild(errorDiv);
+}
+
+// Show fullscreen prompt
+function showFullscreenPrompt(game) {
+    const promptDiv = document.createElement('div');
+    promptDiv.id = 'fullscreen-prompt';
+    promptDiv.style.cssText = `
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #00ffff;
+        font-size: 16px;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.9);
+        padding: 15px 30px;
+        border: 2px solid #00ffff;
+        border-radius: 5px;
+        z-index: 100;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    promptDiv.innerHTML = 'Click here or press F11 for fullscreen experience';
+    
+    promptDiv.addEventListener('click', () => {
+        game.toggleFullscreen();
+        promptDiv.remove();
+    });
+    
+    promptDiv.addEventListener('mouseenter', () => {
+        promptDiv.style.backgroundColor = 'rgba(0, 255, 255, 0.1)';
+        promptDiv.style.transform = 'translateX(-50%) scale(1.05)';
+    });
+    
+    promptDiv.addEventListener('mouseleave', () => {
+        promptDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        promptDiv.style.transform = 'translateX(-50%) scale(1)';
+    });
+    
+    const container = document.getElementById('game-container');
+    container.appendChild(promptDiv);
+    
+    // Auto-hide after 10 seconds
+    setTimeout(() => {
+        if (promptDiv.parentNode) {
+            promptDiv.style.transition = 'opacity 1s';
+            promptDiv.style.opacity = '0';
+            setTimeout(() => promptDiv.remove(), 1000);
+        }
+    }, 10000);
 }
 
 // Mobile detection and setup
