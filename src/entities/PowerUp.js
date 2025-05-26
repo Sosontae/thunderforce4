@@ -29,6 +29,43 @@ class PowerUp extends GameObject {
                 this.fadeOut(1000);
             }
         }, POWERUPS.DURATION);
+
+        this.magnetRange = 150;
+        this.magnetStrength = 0;
+    }
+
+    getColor() {
+        switch (this.type) {
+            case POWERUPS.TYPES.WEAPON_UPGRADE:
+                return '#ffff00'; // Yellow
+            case POWERUPS.TYPES.SHIELD:
+                return '#00ffff'; // Cyan
+            case POWERUPS.TYPES.SPEED_BOOST:
+                return '#ff00ff'; // Magenta
+            case POWERUPS.TYPES.EXTRA_LIFE:
+                return '#00ff00'; // Green
+            case POWERUPS.TYPES.BOMB:
+                return '#ff0000'; // Red
+            default:
+                return '#ffffff'; // White
+        }
+    }
+
+    getSymbol() {
+        switch (this.type) {
+            case POWERUPS.TYPES.WEAPON_UPGRADE:
+                return 'W';
+            case POWERUPS.TYPES.SHIELD:
+                return 'S';
+            case POWERUPS.TYPES.SPEED_BOOST:
+                return '»';
+            case POWERUPS.TYPES.EXTRA_LIFE:
+                return '♥';
+            case POWERUPS.TYPES.BOMB:
+                return 'B';
+            default:
+                return '?';
+        }
     }
 
     update(deltaTime) {
@@ -154,48 +191,82 @@ class PowerUp extends GameObject {
     }
 
     draw(ctx) {
-        const centerY = this.bobAmount;
+        const time = Date.now() * 0.001;
         
-        // Outer glow
-        const glowSize = this.width * (1.5 + this.glowIntensity * 0.5);
-        const gradient = ctx.createRadialGradient(0, centerY, 0, 0, centerY, glowSize);
-        gradient.addColorStop(0, fadeColor(this.color, 0.8 * this.glowIntensity));
-        gradient.addColorStop(0.5, fadeColor(this.color, 0.4 * this.glowIntensity));
-        gradient.addColorStop(1, 'transparent');
+        // Rotation effect
+        ctx.rotate(time);
         
-        ctx.fillStyle = gradient;
-        ctx.fillRect(-glowSize, centerY - glowSize, glowSize * 2, glowSize * 2);
-        
-        // Main body
-        ctx.save();
-        ctx.translate(0, centerY);
-        
-        // Draw based on type
-        switch (this.type) {
-            case POWERUPS.TYPES.WEAPON_UPGRADE:
-                this.drawWeaponUpgrade(ctx);
-                break;
-            case POWERUPS.TYPES.SHIELD:
-                this.drawShield(ctx);
-                break;
-            case POWERUPS.TYPES.SPEED_BOOST:
-                this.drawSpeedBoost(ctx);
-                break;
-            case POWERUPS.TYPES.EXTRA_LIFE:
-                this.drawExtraLife(ctx);
-                break;
-            case POWERUPS.TYPES.BOMB:
-                this.drawBomb(ctx);
-                break;
+        // Draw power-up sprite if available
+        if (window.spriteManager && window.spriteManager.loaded) {
+            // The powerup sprite sheet has 4 frames, each 16x16 pixels
+            const frameWidth = 16;
+            const frameHeight = 16;
+            // Choose frame based on powerup type
+            let frame = 0;
+            switch(this.type) {
+                case POWERUPS.TYPES.WEAPON_UPGRADE:
+                    frame = 0;
+                    break;
+                case POWERUPS.TYPES.SHIELD:
+                    frame = 1;
+                    break;
+                case POWERUPS.TYPES.SPEED_BOOST:
+                    frame = 2;
+                    break;
+                case POWERUPS.TYPES.EXTRA_LIFE:
+                case POWERUPS.TYPES.BOMB:
+                    frame = 3;
+                    break;
+            }
+            
+            // Use animated sprite method for sprite sheet
+            window.spriteManager.drawAnimatedSprite(ctx, 'powerups.powerup', 0, 0, frame, {
+                scale: 2,
+                alpha: this.alpha,
+                centered: true,
+                framesPerRow: 4,
+                frameWidth: frameWidth,
+                frameHeight: frameHeight
+            });
+            
+            // Add glow effect
+            const glowSize = this.width + Math.sin(time * 3) * 5;
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+            gradient.addColorStop(0, fadeColor(this.getColor(), 0.8));
+            gradient.addColorStop(0.5, fadeColor(this.getColor(), 0.3));
+            gradient.addColorStop(1, 'transparent');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-glowSize, -glowSize, glowSize * 2, glowSize * 2);
+        } else {
+            // Fallback to programmatic drawing if sprites not loaded
+            // Glow effect
+            const glowSize = this.width + Math.sin(time * 3) * 5;
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+            gradient.addColorStop(0, fadeColor(this.getColor(), 0.8));
+            gradient.addColorStop(0.5, fadeColor(this.getColor(), 0.3));
+            gradient.addColorStop(1, 'transparent');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-glowSize, -glowSize, glowSize * 2, glowSize * 2);
+            
+            // Core
+            ctx.fillStyle = this.getColor();
+            ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+            
+            // Inner detail
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillRect(-this.width/4, -this.height/4, this.width/2, this.height/2);
+            
+            // Draw type symbol
+            ctx.fillStyle = '#000000';
+            ctx.font = `${this.height/2}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const symbol = this.getSymbol();
+            ctx.fillText(symbol, 0, 0);
         }
-        
-        ctx.restore();
-        
-        // Inner highlight
-        ctx.fillStyle = fadeColor('#ffffff', 0.3 + this.glowIntensity * 0.3);
-        ctx.beginPath();
-        ctx.arc(-this.width / 4, centerY - this.height / 4, this.width / 4, 0, Math.PI * 2);
-        ctx.fill();
     }
 
     drawWeaponUpgrade(ctx) {

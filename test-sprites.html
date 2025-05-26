@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sprite Test</title>
+    <style>
+        body { 
+            background: #222; 
+            color: white; 
+            font-family: monospace;
+            padding: 20px;
+        }
+        canvas { 
+            border: 1px solid #666; 
+            display: block;
+            margin: 20px 0;
+        }
+        .sprite-info {
+            margin: 10px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>Thunder Force IV Sprite Test</h1>
+    <div id="status">Loading sprites...</div>
+    <canvas id="testCanvas" width="800" height="600"></canvas>
+    <div id="sprite-list"></div>
+
+    <script src="src/utils/constants.js"></script>
+    <script src="src/utils/helpers.js"></script>
+    <script src="src/systems/SpriteManager.js"></script>
+    
+    <script>
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusDiv = document.getElementById('status');
+        const listDiv = document.getElementById('sprite-list');
+        
+        async function testSprites() {
+            console.log('Starting sprite test...');
+            
+            try {
+                const success = await window.spriteManager.loadAll();
+                
+                if (success) {
+                    statusDiv.innerHTML = '<span class="success">✓ Sprites loaded successfully!</span>';
+                    
+                    // Clear canvas
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw grid lines
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1;
+                    for (let x = 0; x < canvas.width; x += 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, canvas.height);
+                        ctx.stroke();
+                    }
+                    for (let y = 0; y < canvas.height; y += 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(canvas.width, y);
+                        ctx.stroke();
+                    }
+                    
+                    // Draw loaded sprites
+                    let x = 50;
+                    let y = 50;
+                    let row = 0;
+                    
+                    const sprites = window.spriteManager.sprites;
+                    listDiv.innerHTML = '<h3>Loaded Sprites:</h3>';
+                    
+                    for (const [name, sprite] of Object.entries(sprites)) {
+                        // Draw sprite
+                        ctx.save();
+                        ctx.translate(x, y);
+                        
+                        // Draw sprite background
+                        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                        ctx.fillRect(-40, -40, 80, 80);
+                        
+                        // Draw sprite
+                        window.spriteManager.drawSprite(ctx, name, 0, 0, {
+                            scale: 0.5,
+                            centered: true
+                        });
+                        
+                        // Draw label
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '10px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(name, 0, 50);
+                        
+                        ctx.restore();
+                        
+                        // Add to list
+                        const info = document.createElement('div');
+                        info.className = 'sprite-info';
+                        info.innerHTML = `
+                            <strong>${name}</strong><br>
+                            Dimensions: ${sprite.width}x${sprite.height}
+                        `;
+                        listDiv.appendChild(info);
+                        
+                        // Move to next position
+                        x += 100;
+                        if (x > 700) {
+                            x = 50;
+                            y += 100;
+                            row++;
+                        }
+                    }
+                    
+                    if (Object.keys(sprites).length === 0) {
+                        listDiv.innerHTML += '<p class="error">No sprites were loaded!</p>';
+                    }
+                    
+                } else {
+                    statusDiv.innerHTML = '<span class="error">✗ Failed to load sprites</span>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">✗ Error: ${error.message}</span>`;
+                console.error('Sprite test error:', error);
+            }
+        }
+        
+        // Run test
+        testSprites();
+    </script>
+</body>
+</html> 

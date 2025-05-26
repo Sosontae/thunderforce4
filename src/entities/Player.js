@@ -345,40 +345,78 @@ class Player extends GameObject {
             );
         });
 
-        // Draw ship body
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.moveTo(this.width / 2, 0);
-        ctx.lineTo(-this.width / 2, -this.height / 2);
-        ctx.lineTo(-this.width / 4, 0);
-        ctx.lineTo(-this.width / 2, this.height / 2);
-        ctx.closePath();
-        ctx.fill();
+        // Draw player sprite if available
+        if (window.spriteManager && window.spriteManager.loaded) {
+            // The ship sprite sheet has 5 frames, each 16x24 pixels
+            const frameWidth = 16;
+            const frameHeight = 24;
+            const frame = 2; // Use middle frame (0-4 available)
+            
+            // Use animated sprite method for sprite sheet
+            window.spriteManager.drawAnimatedSprite(ctx, 'player.ship', 0, 0, frame, {
+                scale: 2, // Scale up 2x for visibility
+                alpha: this.alpha,
+                centered: true,
+                framesPerRow: 5,
+                frameSize: frameWidth,
+                frameWidth: frameWidth,
+                frameHeight: frameHeight
+            });
+            
+            // Draw engine glow effect
+            if (this.engineGlow > 0) {
+                const gradient = ctx.createRadialGradient(
+                    -this.width / 2, 0, 0,
+                    -this.width / 2, 0, this.height * this.engineGlow
+                );
+                gradient.addColorStop(0, fadeColor('#ff6600', this.engineGlow));
+                gradient.addColorStop(0.5, fadeColor('#ff9900', this.engineGlow * 0.8));
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(
+                    -this.width / 2 - this.height / 2,
+                    -this.height / 2,
+                    this.height,
+                    this.height
+                );
+            }
+        } else {
+            // Fallback to programmatic drawing if sprites not loaded
+            // Draw ship body
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.moveTo(this.width / 2, 0);
+            ctx.lineTo(-this.width / 2, -this.height / 2);
+            ctx.lineTo(-this.width / 4, 0);
+            ctx.lineTo(-this.width / 2, this.height / 2);
+            ctx.closePath();
+            ctx.fill();
 
-        // Draw cockpit
-        ctx.fillStyle = '#004466';
-        ctx.beginPath();
-        ctx.moveTo(this.width / 4, 0);
-        ctx.lineTo(-this.width / 4, -this.height / 4);
-        ctx.lineTo(-this.width / 4, this.height / 4);
-        ctx.closePath();
-        ctx.fill();
+            // Draw cockpit
+            ctx.fillStyle = '#004466';
+            ctx.beginPath();
+            ctx.moveTo(this.width / 4, 0);
+            ctx.lineTo(-this.width / 4, -this.height / 4);
+            ctx.lineTo(-this.width / 4, this.height / 4);
+            ctx.closePath();
+            ctx.fill();
 
-        // Draw engine glow
-        if (this.engineGlow > 0) {
-            const gradient = ctx.createRadialGradient(
-                -this.width / 2, 0, 0,
-                -this.width / 2, 0, this.height * this.engineGlow
-            );
-            gradient.addColorStop(0, fadeColor('#00ffff', this.engineGlow));
-            gradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(
-                -this.width / 2 - this.height / 2,
-                -this.height / 2,
-                this.height,
-                this.height
-            );
+            // Draw engine glow
+            if (this.engineGlow > 0) {
+                const gradient = ctx.createRadialGradient(
+                    -this.width / 2, 0, 0,
+                    -this.width / 2, 0, this.height * this.engineGlow
+                );
+                gradient.addColorStop(0, fadeColor('#00ffff', this.engineGlow));
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(
+                    -this.width / 2 - this.height / 2,
+                    -this.height / 2,
+                    this.height,
+                    this.height
+                );
+            }
         }
 
         // Draw shield

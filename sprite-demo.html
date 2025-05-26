@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sprite Demo - Minimal</title>
+    <style>
+        body { background: #000; color: white; font-family: monospace; }
+        canvas { border: 1px solid white; margin: 20px; display: block; }
+        #status { margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Thunder Force IV - Sprite Demo</h1>
+    <div id="status">Loading...</div>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
+        
+        // Simple sprite loading
+        const sprites = {};
+        const spritesToLoad = [
+            { name: 'player', src: 'assets/sprites/space_shooter_pack/spritesheets/ship.png' },
+            { name: 'enemy_small', src: 'assets/sprites/space_shooter_pack/spritesheets/enemy-small.png' },
+            { name: 'enemy_medium', src: 'assets/sprites/space_shooter_pack/spritesheets/enemy-medium.png' },
+            { name: 'enemy_big', src: 'assets/sprites/space_shooter_pack/spritesheets/enemy-big.png' },
+            { name: 'powerup', src: 'assets/sprites/space_shooter_pack/spritesheets/power-up.png' },
+            { name: 'explosion', src: 'assets/sprites/space_shooter_pack/spritesheets/explosion.png' }
+        ];
+        
+        let loadedCount = 0;
+        
+        function loadSprite(name, src) {
+            const img = new Image();
+            img.onload = () => {
+                sprites[name] = img;
+                loadedCount++;
+                status.textContent = `Loaded ${loadedCount}/${spritesToLoad.length} sprites...`;
+                
+                if (loadedCount === spritesToLoad.length) {
+                    status.textContent = 'All sprites loaded! Rendering...';
+                    drawDemo();
+                }
+            };
+            img.onerror = () => {
+                status.textContent = `Error loading ${name} from ${src}`;
+                console.error(`Failed to load sprite: ${src}`);
+            };
+            img.src = src;
+        }
+        
+        // Load all sprites
+        spritesToLoad.forEach(sprite => loadSprite(sprite.name, sprite.src));
+        
+        function drawDemo() {
+            // Clear canvas
+            ctx.fillStyle = '#000033';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw title
+            ctx.fillStyle = 'white';
+            ctx.font = '16px monospace';
+            ctx.fillText('Thunder Force IV Sprites (from Space Shooter Pack)', 20, 30);
+            
+            let y = 60;
+            
+            // Draw player ship (sprite sheet with 5 frames)
+            if (sprites.player) {
+                ctx.fillText('Player Ship (5 frames):', 20, y);
+                for (let i = 0; i < 5; i++) {
+                    ctx.drawImage(
+                        sprites.player,
+                        i * 16, 0, 16, 24,  // source
+                        150 + i * 40, y - 20, 32, 48  // destination (2x scale)
+                    );
+                }
+                y += 60;
+            }
+            
+            // Draw enemies
+            if (sprites.enemy_small) {
+                ctx.fillText('Small Enemy (6 frames):', 20, y);
+                for (let i = 0; i < 6; i++) {
+                    ctx.drawImage(
+                        sprites.enemy_small,
+                        i * 16, 0, 16, 16,  // source
+                        150 + i * 40, y - 20, 32, 32  // destination (2x scale)
+                    );
+                }
+                y += 60;
+            }
+            
+            if (sprites.enemy_medium) {
+                ctx.fillText('Medium Enemy (6 frames):', 20, y);
+                for (let i = 0; i < 6; i++) {
+                    ctx.drawImage(
+                        sprites.enemy_medium,
+                        i * 32, 0, 32, 16,  // source
+                        150 + i * 70, y - 20, 64, 32  // destination (2x scale)
+                    );
+                }
+                y += 60;
+            }
+            
+            if (sprites.enemy_big) {
+                ctx.fillText('Big Enemy (6 frames):', 20, y);
+                for (let i = 0; i < 6; i++) {
+                    ctx.drawImage(
+                        sprites.enemy_big,
+                        i * 32, 0, 32, 32,  // source
+                        150 + i * 70, y - 25, 64, 64  // destination (2x scale)
+                    );
+                }
+                y += 80;
+            }
+            
+            if (sprites.powerup) {
+                ctx.fillText('Power-ups (4 frames):', 20, y);
+                for (let i = 0; i < 4; i++) {
+                    ctx.drawImage(
+                        sprites.powerup,
+                        i * 16, 0, 16, 16,  // source
+                        150 + i * 40, y - 20, 32, 32  // destination (2x scale)
+                    );
+                }
+            }
+            
+            // Note about usage
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '14px monospace';
+            ctx.fillText('✓ Sprites loaded successfully! These can be used in your game.', 20, 350);
+            ctx.fillStyle = '#ffff00';
+            ctx.fillText('Note: Each sprite sheet contains multiple frames for animation.', 20, 370);
+        }
+    </script>
+</body>
+</html> 

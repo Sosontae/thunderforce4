@@ -18,8 +18,8 @@ class AssetLoader {
         
         // Define all assets to load
         const assetManifest = {
-            // No sprites - we'll use programmatically drawn graphics
-            sprites: {},
+            // We'll load sprites using the sprite manager
+            sprites: {}, // Handled by SpriteManager
             
             audio: {
                 // Sound effects - matching actual files
@@ -64,6 +64,13 @@ class AssetLoader {
 
         // Load all assets
         try {
+            // Load sprites first using SpriteManager
+            if (window.spriteManager) {
+                console.log('Loading sprites via SpriteManager...');
+                await window.spriteManager.loadAll();
+            }
+            
+            // Then load other assets
             await Promise.all([
                 this.loadAudio(assetManifest.audio),
                 this.loadBackgrounds(assetManifest.backgrounds)

@@ -294,317 +294,156 @@ class Enemy extends GameObject {
     }
 
     draw(ctx) {
-        // Draw health bar for bosses and heavy enemies
-        if (this.type === 'boss' || this.type === 'heavy') {
-            this.drawHealthBar(ctx);
-        }
-        
-        // Draw using programmatic shapes
-        switch (this.type) {
-            case 'basic':
-                this.drawBasicEnemy(ctx);
-                break;
-            case 'medium':
-                this.drawMediumEnemy(ctx);
-                break;
-            case 'heavy':
-                this.drawHeavyEnemy(ctx);
-                break;
-            case 'boss':
-                this.drawBoss(ctx);
-                break;
-            default:
-                super.draw(ctx);
-        }
-    }
-
-    drawBasicEnemy(ctx) {
-        // Outer ring with gradient
-        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width / 2);
-        gradient.addColorStop(0, this.color);
-        gradient.addColorStop(0.7, this.color);
-        gradient.addColorStop(1, fadeColor(this.color, 0.5));
-        
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(0, 0, this.width / 2, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Inner core
-        ctx.fillStyle = fadeColor(this.color, 0.8);
-        ctx.beginPath();
-        ctx.arc(0, 0, this.width / 3, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Eye glow
-        const eyeGlow = 0.5 + Math.sin(Date.now() * 0.01 + this.x) * 0.5;
-        ctx.fillStyle = fadeColor('#ff0000', eyeGlow);
-        ctx.beginPath();
-        ctx.arc(this.width / 4, 0, this.width / 5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Eye
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.arc(this.width / 4, 0, this.width / 8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Decorative spikes
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = 2;
-        for (let i = 0; i < 8; i++) {
-            const angle = (Math.PI * 2 * i) / 8;
-            const x1 = Math.cos(angle) * (this.width / 2 - 2);
-            const y1 = Math.sin(angle) * (this.width / 2 - 2);
-            const x2 = Math.cos(angle) * (this.width / 2 + 4);
-            const y2 = Math.sin(angle) * (this.width / 2 + 4);
-            
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-        }
-    }
-
-    drawMediumEnemy(ctx) {
-        // Rotating effect
         ctx.save();
-        ctx.rotate(Date.now() * 0.002);
         
-        // Main diamond shape with gradient
-        const gradient = ctx.createLinearGradient(-this.width / 2, 0, this.width / 2, 0);
-        gradient.addColorStop(0, fadeColor(this.color, 0.8));
-        gradient.addColorStop(0.5, this.color);
-        gradient.addColorStop(1, fadeColor(this.color, 0.8));
+        // Apply any rotation
+        if (this.rotation) {
+            ctx.rotate(this.rotation);
+        }
         
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.moveTo(-this.width / 2, 0);
-        ctx.lineTo(0, -this.height / 2);
-        ctx.lineTo(this.width / 2, 0);
-        ctx.lineTo(0, this.height / 2);
-        ctx.closePath();
-        ctx.fill();
+        // Draw enemy sprite if available
+        if (window.spriteManager && window.spriteManager.loaded) {
+            let spriteName;
+            let frameWidth, frameHeight, frame = 0, framesPerRow = 1, scale = 1;
+            
+            // Choose sprite and dimensions based on enemy type
+            switch(this.type) {
+                case ENEMY_TYPES.BOSS:
+                    spriteName = 'enemies.biomech';
+                    scale = 1;
+                    break;
+                case ENEMY_TYPES.HEAVY:
+                    spriteName = 'enemies.big';
+                    frameWidth = 32;
+                    frameHeight = 32;
+                    frame = Math.floor(Date.now() / 200) % 6; // Animate through 6 frames
+                    framesPerRow = 6;
+                    scale = 2;
+                    break;
+                case ENEMY_TYPES.MEDIUM:
+                    spriteName = 'enemies.medium';
+                    frameWidth = 32;
+                    frameHeight = 16;
+                    frame = Math.floor(Date.now() / 200) % 6; // Animate through 6 frames
+                    framesPerRow = 6;
+                    scale = 1.5;
+                    break;
+                case ENEMY_TYPES.BASIC:
+                default:
+                    spriteName = 'enemies.small';
+                    frameWidth = 16;
+                    frameHeight = 16;
+                    frame = Math.floor(Date.now() / 200) % 6; // Animate through 6 frames
+                    framesPerRow = 6;
+                    scale = 2;
+                    break;
+            }
+            
+            // Draw the sprite
+            if (frameWidth && frameHeight) {
+                // Use animated sprite for sprite sheets
+                window.spriteManager.drawAnimatedSprite(ctx, spriteName, 0, 0, frame, {
+                    scale: scale,
+                    alpha: this.alpha,
+                    centered: true,
+                    framesPerRow: framesPerRow,
+                    frameWidth: frameWidth,
+                    frameHeight: frameHeight
+                });
+            } else {
+                // Use regular sprite for single images
+                window.spriteManager.drawSprite(ctx, spriteName, 0, 0, {
+                    scale: scale,
+                    alpha: this.alpha,
+                    centered: true
+                });
+            }
+            
+            // Add glow effect for bosses
+            if (this.type === ENEMY_TYPES.BOSS) {
+                ctx.shadowColor = '#ff0000';
+                ctx.shadowBlur = 20;
+            }
+        } else {
+            // Fallback to programmatic drawing if sprites not loaded
+            ctx.fillStyle = this.color;
+            
+            switch(this.type) {
+                case ENEMY_TYPES.BOSS:
+                    // Boss - large diamond shape
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.height/2);
+                    ctx.lineTo(this.width/2, 0);
+                    ctx.lineTo(0, this.height/2);
+                    ctx.lineTo(-this.width/2, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Boss details
+                    ctx.fillStyle = '#ff0000';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.width/4, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                    
+                case ENEMY_TYPES.HEAVY:
+                    // Heavy enemy - rectangular with details
+                    ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+                    
+                    // Details
+                    ctx.fillStyle = '#800000';
+                    ctx.fillRect(-this.width/3, -this.height/3, this.width/3, this.height/3);
+                    ctx.fillRect(0, -this.height/3, this.width/3, this.height/3);
+                    break;
+                    
+                case ENEMY_TYPES.MEDIUM:
+                    // Medium enemy - hexagon shape
+                    const size = this.width/2;
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (Math.PI * 2 / 6) * i;
+                        const x = Math.cos(angle) * size;
+                        const y = Math.sin(angle) * size;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                    
+                case ENEMY_TYPES.BASIC:
+                default:
+                    // Basic enemy - simple circle
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Eye effect
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.beginPath();
+                    ctx.arc(-this.width/4, -this.height/4, 3, 0, Math.PI * 2);
+                    ctx.arc(this.width/4, -this.height/4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+            }
+        }
         
-        // Inner diamond
-        ctx.fillStyle = fadeColor(this.color, 0.5);
-        ctx.beginPath();
-        ctx.moveTo(-this.width / 3, 0);
-        ctx.lineTo(0, -this.height / 3);
-        ctx.lineTo(this.width / 3, 0);
-        ctx.lineTo(0, this.height / 3);
-        ctx.closePath();
-        ctx.fill();
+        // Draw health bar for heavy enemies and bosses
+        if ((this.type === ENEMY_TYPES.HEAVY || this.type === ENEMY_TYPES.BOSS) && this.health < this.maxHealth) {
+            const barWidth = this.width;
+            const barHeight = 4;
+            const barY = -this.height/2 - 10;
+            
+            // Background
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+            ctx.fillRect(-barWidth/2, barY, barWidth, barHeight);
+            
+            // Health
+            const healthPercent = this.health / this.maxHealth;
+            ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
+            ctx.fillRect(-barWidth/2, barY, barWidth * healthPercent, barHeight);
+        }
         
         ctx.restore();
-        
-        // Core with pulsing effect
-        const coreGlow = 0.7 + Math.sin(Date.now() * 0.005) * 0.3;
-        const coreGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width / 3);
-        coreGradient.addColorStop(0, fadeColor('#ff0000', coreGlow));
-        coreGradient.addColorStop(0.5, fadeColor('#660000', coreGlow));
-        coreGradient.addColorStop(1, 'transparent');
-        
-        ctx.fillStyle = coreGradient;
-        ctx.beginPath();
-        ctx.arc(0, 0, this.width / 3, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Energy bolts at corners
-        ctx.fillStyle = fadeColor('#ffff00', coreGlow);
-        const boltSize = 4;
-        ctx.fillRect(-this.width / 2 - boltSize/2, -boltSize/2, boltSize, boltSize);
-        ctx.fillRect(this.width / 2 - boltSize/2, -boltSize/2, boltSize, boltSize);
-        ctx.fillRect(-boltSize/2, -this.height / 2 - boltSize/2, boltSize, boltSize);
-        ctx.fillRect(-boltSize/2, this.height / 2 - boltSize/2, boltSize, boltSize);
-    }
-
-    drawHeavyEnemy(ctx) {
-        // Main body with metallic gradient
-        const bodyGradient = ctx.createLinearGradient(0, -this.height / 2, 0, this.height / 2);
-        bodyGradient.addColorStop(0, fadeColor(this.color, 0.9));
-        bodyGradient.addColorStop(0.3, this.color);
-        bodyGradient.addColorStop(0.7, this.color);
-        bodyGradient.addColorStop(1, fadeColor(this.color, 0.7));
-        
-        ctx.fillStyle = bodyGradient;
-        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
-        
-        // Armor plates with 3D effect
-        const armorGradient = ctx.createLinearGradient(-this.width / 2, 0, -this.width / 6, 0);
-        armorGradient.addColorStop(0, '#555555');
-        armorGradient.addColorStop(0.5, '#888888');
-        armorGradient.addColorStop(1, '#333333');
-        
-        ctx.fillStyle = armorGradient;
-        ctx.fillRect(-this.width / 2, -this.height / 2, this.width / 3, this.height);
-        
-        // Top and bottom armor
-        ctx.fillStyle = '#666666';
-        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height / 4);
-        ctx.fillRect(-this.width / 2, this.height / 4, this.width, this.height / 4);
-        
-        // Armor details
-        ctx.strokeStyle = '#999999';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 4; i++) {
-            const y = -this.height / 2 + (i + 1) * (this.height / 5);
-            ctx.beginPath();
-            ctx.moveTo(-this.width / 2, y);
-            ctx.lineTo(this.width / 2, y);
-            ctx.stroke();
-        }
-        
-        // Weapon ports with glow
-        const weaponGlow = 0.5 + Math.sin(Date.now() * 0.01) * 0.5;
-        for (let i = 0; i < 3; i++) {
-            const y = -this.height / 3 + i * (this.height / 3);
-            
-            // Port glow
-            const glowGradient = ctx.createRadialGradient(this.width / 3, y, 0, this.width / 3, y, 10);
-            glowGradient.addColorStop(0, fadeColor('#ff0000', weaponGlow));
-            glowGradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = glowGradient;
-            ctx.fillRect(this.width / 4 - 10, y - 10, 20, 20);
-            
-            // Port
-            ctx.fillStyle = '#000000';
-            ctx.beginPath();
-            ctx.arc(this.width / 3, y, 5, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        // Engine exhausts
-        const engineGlow = 0.7 + Math.sin(Date.now() * 0.02) * 0.3;
-        ctx.fillStyle = fadeColor('#0099ff', engineGlow);
-        ctx.fillRect(-this.width / 2 - 5, -this.height / 4, 5, 8);
-        ctx.fillRect(-this.width / 2 - 5, this.height / 4 - 8, 5, 8);
-    }
-
-    drawBoss(ctx) {
-        // Rotating parts
-        ctx.save();
-        ctx.rotate(Date.now() * 0.0005);
-        
-        // Outer shield ring
-        const shieldGlow = 0.3 + Math.sin(Date.now() * 0.003) * 0.2;
-        ctx.strokeStyle = fadeColor('#ff00ff', shieldGlow);
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(0, 0, this.width / 2 + 10, 0, Math.PI * 2);
-        ctx.stroke();
-        
-        ctx.restore();
-        
-        // Main hull with gradient
-        const hullGradient = ctx.createLinearGradient(-this.width / 2, 0, this.width / 2, 0);
-        hullGradient.addColorStop(0, fadeColor(this.color, 0.8));
-        hullGradient.addColorStop(0.5, this.color);
-        hullGradient.addColorStop(1, fadeColor(this.color, 0.8));
-        
-        ctx.fillStyle = hullGradient;
-        ctx.beginPath();
-        ctx.moveTo(-this.width / 2, 0);
-        ctx.lineTo(-this.width / 4, -this.height / 2);
-        ctx.lineTo(this.width / 2, -this.height / 3);
-        ctx.lineTo(this.width / 2, this.height / 3);
-        ctx.lineTo(-this.width / 4, this.height / 2);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Armor plating details
-        ctx.strokeStyle = fadeColor(this.color, 0.5);
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(-this.width / 3, -this.height / 3);
-        ctx.lineTo(this.width / 3, -this.height / 4);
-        ctx.lineTo(this.width / 3, this.height / 4);
-        ctx.lineTo(-this.width / 3, this.height / 3);
-        ctx.closePath();
-        ctx.stroke();
-        
-        // Core with multi-layer effects
-        const coreGlow = 0.5 + Math.sin(Date.now() * 0.005) * 0.5;
-        
-        // Outer core glow
-        const coreGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.width / 4);
-        coreGradient.addColorStop(0, fadeColor('#ff00ff', coreGlow));
-        coreGradient.addColorStop(0.5, fadeColor('#ff0066', coreGlow * 0.7));
-        coreGradient.addColorStop(1, 'transparent');
-        ctx.fillStyle = coreGradient;
-        ctx.fillRect(-this.width / 4, -this.width / 4, this.width / 2, this.width / 2);
-        
-        // Inner core
-        ctx.fillStyle = fadeColor('#ffffff', coreGlow);
-        ctx.beginPath();
-        ctx.arc(0, 0, this.width / 8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Weapon systems with energy effects
-        const weaponCharge = 0.7 + Math.sin(Date.now() * 0.01) * 0.3;
-        
-        // Top weapon
-        ctx.save();
-        ctx.translate(-this.width / 3, -this.height / 3);
-        ctx.rotate(-Math.PI / 6);
-        
-        ctx.fillStyle = '#660066';
-        ctx.fillRect(0, 0, this.width / 5, this.height / 8);
-        
-        // Energy charge
-        ctx.fillStyle = fadeColor('#ff00ff', weaponCharge);
-        ctx.beginPath();
-        ctx.arc(this.width / 5, this.height / 16, 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-        
-        // Bottom weapon
-        ctx.save();
-        ctx.translate(-this.width / 3, this.height / 4);
-        ctx.rotate(Math.PI / 6);
-        
-        ctx.fillStyle = '#660066';
-        ctx.fillRect(0, 0, this.width / 5, this.height / 8);
-        
-        // Energy charge
-        ctx.fillStyle = fadeColor('#ff00ff', weaponCharge);
-        ctx.beginPath();
-        ctx.arc(this.width / 5, this.height / 16, 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-        
-        // Engine thrusters
-        for (let i = -1; i <= 1; i++) {
-            const y = i * this.height / 4;
-            const thrustGlow = 0.5 + Math.sin(Date.now() * 0.02 + i) * 0.5;
-            
-            const thrustGradient = ctx.createRadialGradient(
-                -this.width / 2, y, 0,
-                -this.width / 2, y, 15
-            );
-            thrustGradient.addColorStop(0, fadeColor('#00ffff', thrustGlow));
-            thrustGradient.addColorStop(0.5, fadeColor('#0066ff', thrustGlow * 0.5));
-            thrustGradient.addColorStop(1, 'transparent');
-            
-            ctx.fillStyle = thrustGradient;
-            ctx.fillRect(-this.width / 2 - 15, y - 15, 30, 30);
-        }
-    }
-
-    drawHealthBar(ctx) {
-        const barWidth = this.width;
-        const barHeight = 4;
-        const barY = -this.height / 2 - 10;
-        
-        // Background
-        ctx.fillStyle = '#333333';
-        ctx.fillRect(-barWidth / 2, barY, barWidth, barHeight);
-        
-        // Health
-        const healthPercent = this.health / this.maxHealth;
-        const healthColor = healthPercent > 0.5 ? '#00ff00' : 
-                          healthPercent > 0.25 ? '#ffff00' : '#ff0000';
-        ctx.fillStyle = healthColor;
-        ctx.fillRect(-barWidth / 2, barY, barWidth * healthPercent, barHeight);
     }
 } 
