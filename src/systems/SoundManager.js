@@ -3,12 +3,13 @@
 class SoundManager {
     constructor() {
         this.sounds = {};
-        this.enabled = true;
-        this.volume = 0.7;
-        this.musicVolume = 0.5;
-        this.sfxVolume = 0.7;
+        this.music = {};
         this.currentMusic = null;
-        this.initialized = false;
+        this.muted = false;
+        this.soundVolume = 0.5;
+        this.musicVolume = 0.3;
+        this.audioContext = null;
+        this.userInteracted = false;
         
         // Sound pools for frequently played sounds
         this.soundPools = {};
@@ -16,16 +17,49 @@ class SoundManager {
     }
 
     init() {
-        // Initialize audio context
-        if (!window.AudioContext && !window.webkitAudioContext) {
+        // Create audio context
+        try {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioContext();
+        } catch (e) {
             console.warn('Web Audio API not supported');
-            this.enabled = false;
-            return;
         }
+        
+        // Load all sounds
+        this.loadSounds();
+        
+        // Set up user interaction handler
+        this.setupUserInteraction();
+    }
 
+    setupUserInteraction() {
+        const handleInteraction = () => {
+            if (!this.userInteracted) {
+                this.userInteracted = true;
+                
+                // Resume audio context if suspended
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume().then(() => {
+                        console.log('Audio context resumed');
+                    });
+                }
+                
+                // Remove listeners after first interaction
+                document.removeEventListener('click', handleInteraction);
+                document.removeEventListener('keydown', handleInteraction);
+                document.removeEventListener('touchstart', handleInteraction);
+            }
+        };
+        
+        // Add interaction listeners
+        document.addEventListener('click', handleInteraction);
+        document.addEventListener('keydown', handleInteraction);
+        document.addEventListener('touchstart', handleInteraction);
+    }
+
+    loadSounds() {
         // Initialize sounds from loaded assets
         this.initializeSounds();
-        this.initialized = true;
     }
 
     initializeSounds() {
@@ -95,7 +129,7 @@ class SoundManager {
             name: name,
             type: type,
             audio: audio,
-            volume: type === 'music' ? this.musicVolume : this.sfxVolume,
+            volume: type === 'music' ? this.musicVolume : this.soundVolume,
             playing: false,
             play: function() {
                 if (this.playing && this.type === 'music') return;
@@ -108,7 +142,12 @@ class SoundManager {
                     playPromise.then(() => {
                         this.playing = true;
                     }).catch(error => {
-                        console.error(`Error playing ${this.name}:`, error);
+                        // Silently handle autoplay errors
+                        if (error.name === 'NotAllowedError') {
+                            console.log(`Autoplay blocked for ${this.name}, waiting for user interaction`);
+                        } else {
+                            console.error(`Error playing ${this.name}:`, error);
+                        }
                     });
                 }
             },
@@ -148,7 +187,7 @@ class SoundManager {
     }
 
     play(soundName, options = {}) {
-        if (!this.enabled || !this.initialized) return;
+        if (this.muted) return;
 
         // Check if it's a pooled sound
         if (this.soundPools[soundName]) {
@@ -156,19 +195,19 @@ class SoundManager {
             const availableSound = pool.find(sound => !sound.playing);
             
             if (availableSound) {
-                availableSound.setVolume(options.volume || this.sfxVolume);
+                availableSound.setVolume(options.volume || this.soundVolume);
                 availableSound.play();
             }
         } else if (this.sounds[soundName]) {
             const sound = this.sounds[soundName];
             sound.setVolume(options.volume || 
-                          (sound.type === 'music' ? this.musicVolume : this.sfxVolume));
+                          (sound.type === 'music' ? this.musicVolume : this.soundVolume));
             sound.play();
         }
     }
 
     playMusic(musicName, loop = true) {
-        if (!this.enabled || !this.initialized) return;
+        if (this.muted) return;
 
         // Stop current music
         if (this.currentMusic) {
@@ -179,7 +218,22 @@ class SoundManager {
         if (this.sounds[musicName]) {
             this.currentMusic = this.sounds[musicName];
             this.currentMusic.audio.loop = loop;
-            this.currentMusic.play();
+            
+            // Only play if user has interacted
+            if (this.userInteracted) {
+                this.currentMusic.play();
+            } else {
+                // Queue music to play after user interaction
+                const checkInterval = setInterval(() => {
+                    if (this.userInteracted && this.currentMusic === this.sounds[musicName]) {
+                        clearInterval(checkInterval);
+                        this.currentMusic.play();
+                    }
+                }, 100);
+                
+                // Clear interval after 10 seconds to prevent memory leak
+                setTimeout(() => clearInterval(checkInterval), 10000);
+            }
         }
     }
 
@@ -224,7 +278,7 @@ class SoundManager {
     }
 
     setVolume(volume) {
-        this.volume = clamp(volume, 0, 1);
+        this.soundVolume = clamp(volume, 0, 1);
         this.updateAllVolumes();
     }
 
@@ -240,42 +294,42 @@ class SoundManager {
     }
 
     setSFXVolume(volume) {
-        this.sfxVolume = clamp(volume, 0, 1);
+        this.soundVolume = clamp(volume, 0, 1);
         
         // Update all sfx volumes
         Object.keys(this.sounds).forEach(soundName => {
             if (this.sounds[soundName].type === 'sfx') {
-                this.sounds[soundName].setVolume(this.sfxVolume);
+                this.sounds[soundName].setVolume(this.soundVolume);
             }
         });
 
         // Update pooled sounds
         Object.keys(this.soundPools).forEach(poolName => {
             this.soundPools[poolName].forEach(sound => {
-                sound.setVolume(this.sfxVolume);
+                sound.setVolume(this.soundVolume);
             });
         });
     }
 
     updateAllVolumes() {
-        this.setMusicVolume(this.musicVolume * this.volume);
-        this.setSFXVolume(this.sfxVolume * this.volume);
+        this.setMusicVolume(this.musicVolume * this.soundVolume);
+        this.setSFXVolume(this.soundVolume);
     }
 
     mute() {
-        this.enabled = false;
+        this.muted = true;
         this.stopAll();
     }
 
     unmute() {
-        this.enabled = true;
+        this.muted = false;
     }
 
     toggleMute() {
-        if (this.enabled) {
-            this.mute();
-        } else {
+        if (this.muted) {
             this.unmute();
+        } else {
+            this.mute();
         }
     }
 
@@ -303,6 +357,6 @@ class SoundManager {
         const maxDistance = GAME_WIDTH;
         const volume = Math.max(0, 1 - (distance / maxDistance));
         
-        this.play(soundName, { volume: volume * this.sfxVolume });
+        this.play(soundName, { volume: volume * this.soundVolume });
     }
 } 

@@ -143,6 +143,12 @@ class Game {
     }
 
     update(deltaTime) {
+        // Ensure inputManager exists
+        if (!this.inputManager) {
+            console.error('InputManager not initialized!');
+            return;
+        }
+        
         // Handle input
         if (this.currentScene) {
             this.currentScene.handleInput(this.inputManager);

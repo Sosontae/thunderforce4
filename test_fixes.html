@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thunder Force IV - Test Fixes</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-family: monospace;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #333;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Thunder Force IV - Fix Verification</h1>
+    
+    <div id="status"></div>
+    
+    <button onclick="testAudio()">Test Audio (Click to enable audio)</button>
+    <button onclick="testGame()">Test Game Initialization</button>
+    
+    <script>
+        const status = document.getElementById('status');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            status.appendChild(div);
+        }
+        
+        // Test audio file existence
+        async function testAudio() {
+            log('Testing audio files...');
+            
+            const audioFiles = [
+                'assets/audio/powerup.ogg',
+                'assets/audio/shoot_01.ogg',
+                'assets/audio/explosion_01.ogg',
+                'assets/audio/beep_01.ogg'
+            ];
+            
+            for (const file of audioFiles) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        log(`✓ ${file} exists`, 'success');
+                        
+                        // Try to play it
+                        const audio = new Audio(file);
+                        audio.volume = 0.1;
+                        audio.play().then(() => {
+                            log(`✓ ${file} can be played`, 'success');
+                        }).catch(err => {
+                            if (err.name === 'NotAllowedError') {
+                                log(`! ${file} blocked by autoplay policy (this is expected)`, 'warning');
+                            } else {
+                                log(`✗ ${file} play error: ${err.message}`, 'error');
+                            }
+                        });
+                    } else {
+                        log(`✗ ${file} not found (${response.status})`, 'error');
+                    }
+                } catch (err) {
+                    log(`✗ ${file} fetch error: ${err.message}`, 'error');
+                }
+            }
+        }
+        
+        // Test game initialization
+        function testGame() {
+            log('Testing game initialization...');
+            
+            // Check if all required classes exist
+            const requiredClasses = [
+                'Game',
+                'InputManager',
+                'SoundManager',
+                'AssetLoader',
+                'Player',
+                'Scene',
+                'GameScene',
+                'MenuScene'
+            ];
+            
+            let allClassesExist = true;
+            for (const className of requiredClasses) {
+                if (typeof window[className] === 'function') {
+                    log(`✓ ${className} class exists`, 'success');
+                } else {
+                    log(`✗ ${className} class not found`, 'error');
+                    allClassesExist = false;
+                }
+            }
+            
+            if (!allClassesExist) {
+                log('Cannot proceed with game test - missing classes', 'error');
+                return;
+            }
+            
+            // Test InputManager
+            try {
+                const inputManager = new InputManager();
+                log('✓ InputManager created successfully', 'success');
+                
+                // Test key methods
+                if (typeof inputManager.isKeyPressed === 'function') {
+                    log('✓ InputManager.isKeyPressed method exists', 'success');
+                } else {
+                    log('✗ InputManager.isKeyPressed method missing', 'error');
+                }
+            } catch (err) {
+                log(`✗ InputManager error: ${err.message}`, 'error');
+            }
+            
+            // Test SoundManager
+            try {
+                const soundManager = new SoundManager();
+                soundManager.init();
+                log('✓ SoundManager created and initialized', 'success');
+            } catch (err) {
+                log(`✗ SoundManager error: ${err.message}`, 'error');
+            }
+            
+            // Test Game initialization
+            try {
+                const game = new Game();
+                if (game.init()) {
+                    log('✓ Game initialized successfully', 'success');
+                    
+                    // Check inputManager
+                    if (game.inputManager) {
+                        log('✓ Game.inputManager exists', 'success');
+                    } else {
+                        log('✗ Game.inputManager is undefined', 'error');
+                    }
+                } else {
+                    log('✗ Game initialization failed', 'error');
+                }
+            } catch (err) {
+                log(`✗ Game initialization error: ${err.message}`, 'error');
+            }
+        }
+        
+        // Run audio test on load
+        window.addEventListener('load', () => {
+            log('Page loaded, ready for testing');
+        });
+    </script>
+</body>
+</html> 

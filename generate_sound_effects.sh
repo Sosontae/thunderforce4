@@ -26,8 +26,8 @@ sox -n weapon_switch.ogg synth 0.2 sawtooth 300-600 fade 0 0.2 0.1
 sox -n misc_01.ogg synth 0.3 sine 440:880 fade 0 0.3 0.1  # Level start
 sox -n misc_09.ogg synth 0.5 square 100:200 tremolo 10 fade 0 0.5 0.2  # Boss warning
 
-# Power-up collection
-sox -n powerup.ogg synth 0.3 sine 440:880:1320 fade 0 0.3 0.1
+# Power-up collection - Fixed syntax
+sox -n powerup.ogg synth 0.3 sine 440 sine 880 sine 1320 fade 0 0.3 0.1
 
 # Shield hit
 sox -n shield_hit.ogg synth 0.1 noise highpass 2000 fade 0 0.1 0.05

@@ -102,22 +102,25 @@ class Player extends GameObject {
         // Movement
         this.handleMovement(inputManager);
 
-        // Shooting
-        if (inputManager.isKeyPressed('Space') || inputManager.isKeyPressed('KeyZ')) {
-            this.shoot();
-        }
-        
-        // Weapon switching (X key)
-        if (inputManager.isKeyJustPressed('KeyX')) {
-            this.weaponSystem.cycleWeapon(1);
-            if (window.soundManager) {
-                window.soundManager.play('weaponSwitch');
+        // Only handle input if inputManager is available
+        if (inputManager) {
+            // Shooting
+            if (inputManager.isKeyPressed('Space') || inputManager.isKeyPressed('KeyZ')) {
+                this.shoot();
             }
-        }
-        
-        // Speed control (C key)
-        if (inputManager.isKeyJustPressed('KeyC')) {
-            this.cycleSpeedMode();
+            
+            // Weapon switching (X key)
+            if (inputManager.isKeyJustPressed('KeyX')) {
+                this.weaponSystem.cycleWeapon(1);
+                if (window.soundManager) {
+                    window.soundManager.play('weaponSwitch');
+                }
+            }
+            
+            // Speed control (C key)
+            if (inputManager.isKeyJustPressed('KeyC')) {
+                this.cycleSpeedMode();
+            }
         }
 
         // Update position
@@ -143,6 +146,12 @@ class Player extends GameObject {
         // Reset velocity
         this.vx = 0;
         this.vy = 0;
+        
+        // Check if inputManager exists
+        if (!inputManager) {
+            console.warn('InputManager not available');
+            return;
+        }
         
         // Apply speed mode
         let currentSpeed = this.speed;
