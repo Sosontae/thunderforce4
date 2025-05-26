@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Thunder Force IV signature gradients -->
+    <linearGradient id="metallicBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2E5C8A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1A3A5C;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="metallicSilver" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8E8E8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#A0A0A0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#606060;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="engineGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF6B00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFFF00;stop-opacity:0.5" />
+    </linearGradient>
+    
+    <radialGradient id="weaponGlow">
+      <stop offset="0%" style="stop-color:#00FFFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0080FF;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#0040FF;stop-opacity:0.3" />
+    </radialGradient>
+    
+    <!-- Pixel grid pattern for retro feel -->
+    <pattern id="pixelGrid" x="0" y="0" width="2" height="2" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1" height="1" fill="#000000" opacity="0.1"/>
+      <rect x="1" y="1" width="1" height="1" fill="#000000" opacity="0.1"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#0A1929"/>
+  
+  <!-- Title -->
+  <text x="600" y="50" font-family="Arial, sans-serif" font-size="32" font-weight="bold" 
+        text-anchor="middle" fill="#FFFFFF">Thunder Force IV Style Guide</text>
+  
+  <!-- Color Palette Section -->
+  <g transform="translate(50, 100)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" fill="#FFFFFF">Color Palette</text>
+    
+    <!-- Primary Colors -->
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">Primary Metallic Colors:</text>
+    <rect x="0" y="40" width="60" height="40" fill="#1A3A5C"/>
+    <rect x="70" y="40" width="60" height="40" fill="#2E5C8A"/>
+    <rect x="140" y="40" width="60" height="40" fill="#4A90E2"/>
+    <rect x="210" y="40" width="60" height="40" fill="#606060"/>
+    <rect x="280" y="40" width="60" height="40" fill="#A0A0A0"/>
+    <rect x="350" y="40" width="60" height="40" fill="#E8E8E8"/>
+    
+    <!-- Accent Colors -->
+    <text x="0" y="110" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">Accent Colors (Engines/Weapons):</text>
+    <rect x="0" y="120" width="60" height="40" fill="#FF6B00"/>
+    <rect x="70" y="120" width="60" height="40" fill="#FFA500"/>
+    <rect x="140" y="120" width="60" height="40" fill="#FFFF00"/>
+    <rect x="210" y="120" width="60" height="40" fill="#00FFFF"/>
+    <rect x="280" y="120" width="60" height="40" fill="#0080FF"/>
+    <rect x="350" y="120" width="60" height="40" fill="#FF0080"/>
+  </g>
+  
+  <!-- Example Player Ship Design -->
+  <g transform="translate(50, 300)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" fill="#FFFFFF">Fire LEO-04 "Rynex" Style Reference</text>
+    
+    <!-- Ship body -->
+    <g transform="translate(0, 20)">
+      <!-- Main hull -->
+      <path d="M 50 40 L 150 40 L 170 50 L 170 60 L 150 70 L 50 70 L 30 60 L 30 50 Z" 
+            fill="url(#metallicBlue)" stroke="#1A3A5C" stroke-width="2"/>
+      
+      <!-- Cockpit -->
+      <path d="M 80 45 L 120 45 L 125 55 L 120 65 L 80 65 L 75 55 Z" 
+            fill="url(#metallicSilver)" stroke="#404040" stroke-width="1"/>
+      
+      <!-- Engine pods -->
+      <rect x="20" y="45" width="25" height="8" fill="url(#metallicSilver)" stroke="#404040"/>
+      <rect x="20" y="57" width="25" height="8" fill="url(#metallicSilver)" stroke="#404040"/>
+      
+      <!-- Engine glow -->
+      <ellipse cx="20" cy="49" rx="15" ry="4" fill="url(#engineGlow)" opacity="0.8"/>
+      <ellipse cx="20" cy="61" rx="15" ry="4" fill="url(#engineGlow)" opacity="0.8"/>
+      
+      <!-- Weapon mounts -->
+      <circle cx="155" cy="47" r="4" fill="url(#weaponGlow)"/>
+      <circle cx="155" cy="63" r="4" fill="url(#weaponGlow)"/>
+      
+      <!-- Detail lines -->
+      <line x1="60" y1="42" x2="140" y2="42" stroke="#80C0FF" stroke-width="1" opacity="0.5"/>
+      <line x1="60" y1="68" x2="140" y2="68" stroke="#80C0FF" stroke-width="1" opacity="0.5"/>
+    </g>
+  </g>
+  
+  <!-- Enemy Ship Examples -->
+  <g transform="translate(500, 300)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" fill="#FFFFFF">Enemy Ship Design Elements</text>
+    
+    <!-- Basic Enemy -->
+    <g transform="translate(0, 30)">
+      <text x="0" y="-5" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">Basic Enemy</text>
+      <circle cx="25" cy="25" r="20" fill="url(#metallicSilver)" stroke="#404040" stroke-width="2"/>
+      <circle cx="20" cy="20" r="5" fill="#FF0000" opacity="0.8"/>
+      <circle cx="30" cy="20" r="5" fill="#FF0000" opacity="0.8"/>
+      <path d="M 15 30 Q 25 35 35 30" fill="none" stroke="#FF0000" stroke-width="2"/>
+    </g>
+    
+    <!-- Medium Enemy -->
+    <g transform="translate(100, 30)">
+      <text x="0" y="-5" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">Medium Enemy</text>
+      <path d="M 0 25 L 20 10 L 40 10 L 60 25 L 60 35 L 40 50 L 20 50 L 0 35 Z" 
+            fill="#8B4513" stroke="#4B2813" stroke-width="2"/>
+      <rect x="15" y="20" width="30" height="20" fill="url(#metallicSilver)" opacity="0.7"/>
+      <circle cx="20" cy="30" r="3" fill="#FF0000"/>
+      <circle cx="40" cy="30" r="3" fill="#FF0000"/>
+    </g>
+    
+    <!-- Boss Element -->
+    <g transform="translate(200, 20)">
+      <text x="0" y="-5" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">Boss Design</text>
+      <rect x="0" y="0" width="80" height="60" fill="url(#metallicBlue)" stroke="#1A3A5C" stroke-width="3"/>
+      <circle cx="20" cy="20" r="8" fill="url(#weaponGlow)"/>
+      <circle cx="60" cy="20" r="8" fill="url(#weaponGlow)"/>
+      <circle cx="40" cy="40" r="12" fill="#FF0000" opacity="0.8"/>
+      <path d="M 0 30 L -10 20 L -10 40 Z" fill="url(#metallicSilver)"/>
+      <path d="M 80 30 L 90 20 L 90 40 Z" fill="url(#metallicSilver)"/>
+    </g>
+  </g>
+  
+  <!-- Visual Effects -->
+  <g transform="translate(50, 500)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" fill="#FFFFFF">Visual Effects</text>
+    
+    <!-- Projectile types -->
+    <g transform="translate(0, 30)">
+      <text x="0" y="-5" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">Projectiles</text>
+      
+      <!-- Standard shot -->
+      <circle cx="20" cy="20" r="4" fill="#00FFFF"/>
+      <circle cx="20" cy="20" r="6" fill="none" stroke="#00FFFF" stroke-width="1" opacity="0.5"/>
+      
+      <!-- Blade weapon -->
+      <rect x="50" y="18" width="20" height="4" fill="#FF00FF"/>
+      <rect x="48" y="16" width="24" height="8" fill="none" stroke="#FF00FF" stroke-width="1" opacity="0.5"/>
+      
+      <!-- Thunder sword -->
+      <path d="M 100 10 L 105 20 L 100 15 L 110 30 L 105 25 L 115 35" 
+            fill="none" stroke="#FFFF00" stroke-width="2"/>
+      <path d="M 100 10 L 105 20 L 100 15 L 110 30 L 105 25 L 115 35" 
+            fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.5"/>
+    </g>
+    
+    <!-- Explosion frames -->
+    <g transform="translate(0, 80)">
+      <text x="0" y="-5" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">Explosion Sequence</text>
+      <circle cx="20" cy="20" r="5" fill="#FFFF00" opacity="0.8"/>
+      <circle cx="50" cy="20" r="10" fill="#FFA500" opacity="0.6"/>
+      <circle cx="80" cy="20" r="15" fill="#FF6B00" opacity="0.4"/>
+      <circle cx="110" cy="20" r="20" fill="#FF0000" opacity="0.2"/>
+    </g>
+  </g>
+  
+  <!-- Style Notes -->
+  <g transform="translate(500, 500)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="20" fill="#FFFFFF">Design Principles</text>
+    <text x="0" y="30" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">• Use metallic gradients for all surfaces</text>
+    <text x="0" y="50" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">• Add bright glow effects for engines and weapons</text>
+    <text x="0" y="70" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">• Include mechanical details (panels, vents, etc.)</text>
+    <text x="0" y="90" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">• Use sharp, angular designs for aggressive look</text>
+    <text x="0" y="110" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">• Apply subtle scan lines or dithering for retro feel</text>
+    <text x="0" y="130" font-family="Arial, sans-serif" font-size="14" fill="#CCCCCC">• Ensure consistent lighting from top-left</text>
+  </g>
+  
+  <!-- Grid overlay -->
+  <rect width="1200" height="800" fill="url(#pixelGrid)" opacity="0.3"/>
+</svg> 
